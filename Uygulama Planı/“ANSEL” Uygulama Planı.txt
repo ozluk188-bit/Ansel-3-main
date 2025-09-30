@@ -1,0 +1,376 @@
+“ANSEL” Uygulaması
+*Uygulama Türkçe dilinde olacak
+1. Kalem Kavramı
+•	“Kalem” = Kullanıcıların belirli bir konu etrafında içerik paylaşmasını sağlayan başlık.
+•	Örnek: "Ankara’daki en güzel gün batımı manzarası".
+•	Her Kalem herkese açık; anonim kullanıcılar dahil herkes görebilir.
+•	Benzer Kalem Önerisi: Yeni Kalem oluştururken başlık çakışmalarını azaltmak için benzer başlık önerileri gösterilir.
+•	Etiket (Tag) Sistemi: Kalem’lere #Ankara, #GünBatımı gibi etiketler eklenir; arama ve keşif kolaylaşır.
+2. Kalem İçerikleri
+•	Fotoğraf, video, yazı, ses dosyası ve GIF desteği.
+•	Beğenme 👍 / Beğenmeme 👎 sistemi.
+•	Anonim kullanıcılar beğeni/beğenmeme yapamaz.
+•	Puanlama:
+o	Net Beğeni Oranı: beğeni / (beğeni + beğenmeme)
+o	Yenilik Faktörü: Son 24 saat ağırlığı ile popülerlik sıralaması.
+•	Beğenmeme nedenleri (ör. “uygunsuz”) kullanıcıdan istenir → moderasyon verisi.
+3. Kalem Oluşturma Kuralları
+•	Başlık benzersiz, max 100 karakter.
+•	Yerel dile özgü küfür/argo için dinamik filtre (Cloud Functions).
+•	Kullanıcı başına günlük max 3 Kalem limiti (spam önleme).
+•	Oluşturucu, Kalem’e özel kurallar ekleyebilir (ör. “Sadece siyah-beyaz fotoğraflar”).
+4. Erişim ve Yetkiler
+•	Anonim kullanıcılar: Sadece içerik görüntüleyebilir.
+•	Kayıtlı kullanıcılar: İçerik paylaşabilir, oy verebilir, yorum yazabilir, mesaj gönderebilir.
+•	Anonim kullanıcıları kayıt olmaya teşvik eden CTA’lar (ör. “Beğeni için giriş yap”).
+•	Aktif kullanıcılara “süper kullanıcı” veya moderatör rolü atanabilir.
+5. Keşfet ve Arama
+•	Popüler Kalemler (24 saat, 7 gün, tüm zamanlar).
+•	Anahtar kelime ile arama.
+•	Metin tabanlı arama ve popüler etiket önerileri (NLP tabanlı öneriler ileride eklenebilir).
+•	Çoklu sıralama: “En Popüler”, “Yeniler”, “En Çok Yorum Alan”.
+•	Trend algoritması: popularityScore = (beğeni + yorum) * yenilik_faktörü.
+•	Kullanıcıların takip ettiği etiketlere göre önerilen Kalem’ler (Firebase Predictions ile basit öneri sistemi).
+6. Bildirim Sistemi
+•	Takip edilen Kalemlerde yeni paylaşım bildirimi.
+•	Beğeni, beğenmeme, yorum bildirimi.
+•	Kişiselleştirilmiş haftalık özet bildirimleri (kullanıcının takip ettiği Kalem’lere göre en popüler içerikler).
+•	Bildirim özelleştirme (ör. sadece beğeniler).
+•	Push bildirimlerde A/B testi ile tıklama oranı analizi.
+•	Kullanıcıları rahatsız etmemek için bildirim kapatma seçeneğiyle onboarding ekranı.
+7. Yorumlar
+•	Yorumlar oylanabilir.
+•	Reddit tarzı cevap (reply) sistemi ile tartışma iplikleri.
+•	Minimum karakter sınırı (örn. 10) veya AI tabanlı spam filtresi.
+8. Moderasyon ve Raporlama
+•	Uygunsuz içerik raporlama.
+•	Rapor durumu kullanıcıya bildirilir (“Raporunuz inceleniyor”).
+•	Kullanıcılar için “hızlı itiraz” butonu ile moderasyon kararlarına itiraz etme.
+•	Sürekli ihlal yapanlara geçici paylaşım yasağı.
+•	Otomatik görsel filtre (Cloud Vision API).
+•	Ölçeklenebilir moderasyon: Süper kullanıcılar ve topluluk moderatörleri için rehber/egitim ekranı.
+9. Mesajlaşma Özelliği
+•	1’e 1 mesajlaşma (ilk sürüm).
+•	Firestore tabanlı gerçek zamanlı iletim.
+•	Metin, fotoğraf, video, ses, emoji desteği.
+•	Okundu bilgisi, son görülme, “yazıyor…” göstergesi.
+•	Kullanıcı engelleme ve sohbet içinden raporlama.
+10. Üyelik ve Giriş Sistemi
+•	FirebaseUI Auth ile giriş/kayıt/şifre sıfırlama/e-posta doğrulama.
+•	E-posta/Şifre, Google, Facebook (opsiyonel), Apple ID (iOS zorunlu).
+•	Anonim giriş (Firebase Anonymous Auth).
+•	Anonim hesabı kalıcı hesaba bağlama mekanizması.
+11. Medya Optimizasyonu
+•	Yükleme öncesi sıkıştırma:
+o	Resimler: WebP/AVIF
+o	Videolar: çözünürlük ve bitrate düşürme
+•	Maks çözünürlük: fotoğraf 1080p, video 720p.
+•	Lazy loading + önbellekleme.
+•	Global kullanıcılar için CDN entegrasyonu.
+12. Kullanıcı Etkileşimi ve Oyunlaştırma
+•	Rozet ve seviye sistemi.
+•	Yaratıcı rozet kategorileri (ör. “Gece Yarısı Kaşifi” – gece paylaşım yapanlar, “Maratoncu” – bir haftada 10 içerik paylaşanlar).
+•	Liderlik tablosu (yerel: ülke/şehir bazlı, global).
+•	Kalem takip sistemi.
+•	Mesajlaşmada çevrim içi durumu gösterme.
+•	Koleksiyonlar (kaydetme özelliği).
+•	Boş sayfa tasarımı (ilk paylaşımı teşvik).
+•	“Arkadaşını Davet Et” özelliği ve davet edenlere rozet/puan ödülü.
+13. Çoklu Platform Uyum
+•	React Native + Expo ile Android, iOS, Web.
+•	PWA desteği + çevrimdışı mod (Expo Web ile entegre Service Worker ve AsyncStorage).
+•	Platforma özel UX (mobilde tam ekran, webde yan panel).
+•	Ekran okuyucu desteği ve yüksek kontrast modu ile erişilebilirlik (Accessibility API).
+14. Analitik ve İzleme
+•	Firebase Analytics ile kullanıcı davranış takibi.
+•	Kalemlerde geçirilen süre ölçümü.
+•	Crashlytics ile hata raporları.
+•	A/B testleri (UI, bildirim, push).
+•	Sentry ile kullanıcı akış analitiği (funnel analysis).
+15. Algoritma ve İçerik Yönetimi
+•	Dinamik popülerlik puanı (hot score).
+•	Güvenli sayı güncelleme (Cloud Functions trigger).
+•	popularityScore periyodik Cloud Function ile güncellenir.
+16. Teknik Mimari
+•	Firebase maliyet optimizasyonu (sıkıştırma, önbellekleme, sayfalama ile Firestore sorgu sınırı).
+•	Firestore Security Rules testleri (mesajlar sadece gönderen/alıcı).
+•	Rate limiting (Cloud Functions veya API Gateway).
+•	messages koleksiyonunda seen alanına index.
+•	oylar koleksiyonunda tek oy kuralı Security Rules ile.
+•	Navigasyon: React Navigation ile stack ve tab navigasyonu (Kalem listesi, Keşfet, profil, mesajlaşma).
+•	State Yönetimi: Zustand veya Provider; Firebase gerçek zamanlı veri için React Query.
+•	Çevrimdışı Mod: AsyncStorage ile Kalem listesi ve kaydedilmiş içerikler; Workbox ile PWA desteği.
+•	Medya Yükleme: Expo ImagePicker ve MediaLibrary; video sıkıştırma için expo-video-thumbnails.
+•	Test: React Native Testing Library, Jest, Firebase Emulator Suite ile Security Rules testleri.
+17. Olası Zorluklar ve Çözümler
+•	Ölçeklendirme: Blaze plan öncesi önbellekleme katmanı (Redis).
+•	Moderasyon yükü: otomatik filtreler + topluluk moderatörleri.
+•	Kullanıcı edinimi: viral paylaşım butonları, sosyal medya entegrasyonu, “Arkadaşını Davet Et” kampanyaları.
+18. Ek Öneriler
+•	Monetizasyon: reklam, premium üyelik (reklamsız, özel rozetler), sponsorlu Kalem’ler.
+•	Topluluk odaklılık: özel (davetli) Kalem’ler.
+•	Sosyal medya entegrasyonu: Kalem/içerik paylaşımı için WhatsApp, Instagram Stories, X (Expo Share API).
+
+ANSEL- Teknik Mimari Planı (Tüm Katmanlar ve Modüller)
+1. İstemci Katmanı (Client Layer)
+•	Teknoloji: React Native + Expo (Android, iOS, Web, Expo Web ile PWA desteği)
+•	Özellikler:
+•	Platforma özel UX (mobilde tam ekran, webde yan panel)
+•	PWA + çevrimdışı mod (Expo Web ile Service Worker, AsyncStorage, Workbox)
+•	Medya yükleme öncesi sıkıştırma (WebP/AVIF, video bitrate düşürme – Expo ImageManipulator, expo-video-thumbnails)
+•	Lazy loading + önbellekleme (React Native Fast Image ve Expo Cache)
+•	Bildirim yönetimi (Expo Notifications ile Firebase Cloud Messaging)
+•	UI bileşenleri: Kalem listesi, keşfet, profil, mesajlaşma, bildirimler (React Navigation, NativeBase)
+•	Ekran okuyucu desteği ve yüksek kontrast modu (Accessibility API)
+2. Sunucu Tarafı / Backend Katmanı
+•	Firebase Authentication
+o	E-posta/Şifre, Google, Apple ID (iOS zorunlu), Anonim giriş
+o	Anonim → kalıcı hesap bağlama mekanizması
+•	Firebase Firestore (NoSQL)
+o	Koleksiyonlar:
+	kalemler, icerikler, yorumlar, oylar, mesajlar, kullanicilar
+o	Index’ler (örn. messages.seen alanı)
+o	Security Rules:
+	Tek oy kuralı
+	Mesaj erişim kısıtlaması (sadece gönderen/alıcı)
+•	Firebase Storage
+o	Medya dosyaları (fotoğraf, video, ses, GIF)
+o	CDN entegrasyonu (global erişim)
+•	Firebase Cloud Functions
+o	Dinamik küfür/argo filtresi (yerel dile özgü)
+o	popularityScore periyodik hesaplama
+o	Rate limiting (spam önleme)
+o	Metin tabanlı arama ve etiket önerileri
+o	Benzer Kalem önerisi algoritması
+o	Moderasyon otomasyonu (rapor işleme)
+•	Firebase Cloud Messaging
+o	Bildirim özelleştirme seçenekleri
+o	Push bildirimlerde A/B test entegrasyonu
+•	Firebase Analytics & Crashlytics
+o	Kullanıcı davranış analizi
+o	Kalemlerde geçirilen süre ölçümü
+o	UI A/B testleri
+o	Hata raporlama
+o	Sentry ile funnel analysis
+3. Entegrasyon Katmanı
+•	Cloud Vision API → Görsel moderasyon (uygunsuz içerik tespiti)
+•	Firebase Predictions → Kullanıcıların takip ettiği etiketlere göre öneriler
+•	Redis / Cache Katmanı → Ölçeklendirme öncesi hız optimizasyonu
+•	Sosyal Medya API’leri → Viral paylaşım (WhatsApp, Instagram Stories, X) ve kullanıcı edinimi
+4. Güvenlik ve Erişim Katmanı
+•	Firestore Security Rules
+•	Storage Security Rules
+•	API Gateway (rate limiting, IP kısıtlama)
+5. İzleme ve Operasyon Katmanı
+•	Firebase Analytics dashboard
+•	Crashlytics hata raporları
+•	Performans izleme
+•	Web tabanlı moderasyon paneli (admin arayüzü)
+6. Öne Çıkan Yeni Eklemeler
+•	Benzer Kalem önerisi → Başlık çakışmalarını azaltma
+•	Etiket sistemi → Arama ve keşfi güçlendirme
+•	Net beğeni oranı + yenilik faktörü → Popülerlik sıralaması
+•	Beğenmeme nedenleri → Moderasyon verisi toplama
+•	Ses dosyası ve GIF desteği
+•	Kullanıcı başına günlük Kalem limiti
+•	Bildirim özelleştirme ve A/B testleri
+•	Reddit tarzı cevap sistemi → Yorum iplikleri
+•	Rapor durumu bildirimi ve hızlı itiraz butonu
+•	Rozet kategorileri (“Gece Yarısı Kaşifi”, “Maratoncu”) ve yerel/global liderlik tablosu
+•	PWA çevrimdışı mod (Workbox)
+•	CDN entegrasyonu
+•	Monetizasyon seçenekleri (reklam, premium, sponsorlu Kalem)
+•	Sosyal medya paylaşımı (WhatsApp, Instagram Stories, X)
+•	“Arkadaşını Davet Et” özelliği ve rozet/puan ödülü
+•	Ekran okuyucu ve yüksek kontrast modu
+•	Kullanıcı profili özelleştirme (tema, biyografi, sosyal medya bağlantıları)
+
+ANSEL – Katmanlı Teknik Mimari
+[1] İstemci Katmanı (Client Layer)
+    ├─ React Native + Expo App (Android, iOS, Web, Expo Web ile PWA)
+    │   ├─ Platforma özel UX (mobil tam ekran, web yan panel)
+    │   ├─ Çevrimdışı mod (Expo Web ile Service Worker, AsyncStorage, Workbox)
+    │   ├─ UI/UX bileşenleri (Kalem listesi, keşfet, profil, mesajlaşma – React Navigation, NativeBase)
+    │   ├─ Medya ön sıkıştırma (WebP/AVIF, video bitrate düşürme – Expo ImageManipulator, expo-video-thumbnails)
+    │   ├─ Bildirim yönetimi (Expo Notifications ile Firebase Cloud Messaging)
+    │   └─ Erişilebilirlik (ekran okuyucu, yüksek kontrast modu)
+[2] Sunucu Tarafı / Backend Katmanı
+    ├─ Firebase Authentication
+    │   ├─ E-posta/Şifre, Google, Apple ID (iOS zorunlu), Anonim giriş
+    │   └─ Anonim → kalıcı hesap bağlama
+    ├─ Firebase Firestore (NoSQL DB)
+    │   ├─ Koleksiyonlar:
+    │   │   ├─ kalemler
+    │   │   ├─ içerikler
+    │   │   ├─ yorumlar
+    │   │   ├─ oylar
+    │   │   ├─ mesajlar
+    │   │   └─ kullanıcılar
+    │   ├─ Index’ler (örn. messages.seen alanı)
+    │   └─ Security Rules (tek oy kuralı, mesaj erişim kısıtlaması)
+    ├─ Firebase Storage
+    │   ├─ Medya dosyaları (foto, video, ses, GIF)
+    │   └─ CDN entegrasyonu (global erişim)
+    ├─ Firebase Cloud Functions
+    │   ├─ Dinamik küfür/argo filtresi
+    │   ├─ popularityScore periyodik hesaplama
+    │   ├─ Rate limiting (spam önleme)
+    │   ├─ Metin tabanlı arama ve etiket önerileri
+    │   └─ Moderasyon otomasyonu (rapor işleme)
+    ├─ Firebase Cloud Messaging (Push bildirimler)
+    │   ├─ Bildirim özelleştirme
+    │   └─ A/B test entegrasyonu
+    └─ Firebase Analytics & Crashlytics
+        ├─ Kullanıcı davranış analizi
+        ├─ Kalemlerde geçirilen süre ölçümü
+        ├─ UI A/B testleri
+        └─ Sentry ile funnel analysis
+[3] Entegrasyon Katmanı
+    ├─ Cloud Vision API (görsel moderasyon)
+    ├─ Firebase Predictions (etiket bazlı öneriler)
+    ├─ Redis / Cache katmanı (ölçeklendirme öncesi hız optimizasyonu)
+    └─ Sosyal medya paylaşım API’leri (WhatsApp, Instagram Stories, X)
+[4] Güvenlik ve Erişim Katmanı
+    ├─ Firestore Security Rules
+    ├─ Storage Security Rules
+    ├─ API Gateway (rate limiting, IP kısıtlama)
+[5] İzleme ve Operasyon Katmanı
+    ├─ Firebase Analytics dashboard
+    ├─ Crashlytics hata raporları
+    ├─ Performans izleme
+    └─ Moderasyon paneli (web tabanlı admin)
+
+ANSEL - Veri Modeli
+Koleksiyon: kullanicilar
+- uid (string) → Firebase Auth UID
+- ad (string) → Görünen ad
+- profilFotoURL (string) → Profil fotoğrafı
+- email (string) → E‑posta (opsiyonel anonimlerde boş)
+- rol (string) → normal, super, moderator, admin
+- katilimTarihi (timestamp) → Kayıt tarihi
+- rozetler (array) → Kullanıcının kazandığı rozetler
+- istatistik (map) → { toplamKalem, toplamBeğeni, toplamYorum }
+- bildirimTercihleri (map) → Bildirim özelleştirme ayarları
+- profilTema (string) → Kullanıcı profili teması
+- biyografi (string) → Kullanıcı biyografisi
+- sosyalMedyaBaglantilari (array) → Sosyal medya bağlantıları (örn. X, Instagram)
+
+Koleksiyon: kalemler
+- kalemId (string) → Otomatik ID
+- baslik (string) → Kalem başlığı
+- etiketler (array) → #tag listesi
+- olusturanId (string) → Kullanıcı UID
+- olusturmaTarihi (timestamp) → Oluşturulma zamanı
+- icerikSayisi (number) → İçerik adedi
+- popularityScore (number) → (beğeni + yorum) * yenilik_faktörü
+- durum (string) → aktif, kilitli, silinmiş
+- kurallar (map) → Kaleme özel kurallar
+İndeks Önerileri:
+- etiketler + popularityScore (keşif sıralaması)
+
+Koleksiyon: icerikler
+- icerikId (string) → Otomatik ID
+- kalemId (string) → İlgili Kalem ID
+- olusturanId (string) → Kullanıcı UID
+- tip (string) → foto, video, yazi, ses, gif
+- medyaURL (string) → Firebase Storage URL
+- metin (string) → (Opsiyonel) açıklama
+- olusturmaTarihi (timestamp) → Paylaşım zamanı
+- begeniSayisi (number) → Toplam beğeni
+- begenmemeSayisi (number) → Toplam beğenmeme
+- netBegeniOrani (number) → beğeni / (beğeni + beğenmeme)
+- durum (string) → aktif, raporlu, silinmiş
+İndeks Önerileri:
+- kalemId + netBegeniOrani
+- kalemId + olusturmaTarihi
+
+Koleksiyon: oylar
+- icerikId (string) → İçerik ID
+- kullaniciId (string) → Kullanıcı UID
+- oy (number) → 1 = beğeni, -1 = beğenmeme
+- neden (string) → (Opsiyonel) beğenmeme nedeni
+- tarih (timestamp) → Oy zamanı
+Security Rule:
+- Her kullanıcı + içerik için tek oy kuralı
+
+Koleksiyon: yorumlar
+- yorumId (string) → Otomatik ID
+- icerikId (string) → İçerik ID
+- kullaniciId (string) → Kullanıcı UID
+- metin (string) → Yorum metni
+- ustYorumId (string) → (Opsiyonel) cevaplanan yorum ID’si
+- olusturmaTarihi (timestamp) → Yorum zamanı
+- begeniSayisi (number) → Yorum beğeni sayısı
+- durum (string) → aktif, raporlu, silinmiş
+
+Koleksiyon: mesajlar
+- mesajId (string) → Otomatik ID
+- sohbetId (string) → Sohbet ID
+- gonderenId (string) → Kullanıcı UID
+- aliciId (string) → Kullanıcı UID
+- tip (string) → metin, foto, video, ses, gif
+- icerik (string) → Mesaj metni veya medya URL
+- tarih (timestamp) → Gönderim zamanı
+- seen (boolean) → Görüldü bilgisi
+- durum (string) → aktif, silinmiş
+İndeks Önerileri:
+- sohbetId + tarih
+- seen alanı (okunmamış mesaj sorguları)
+
+Koleksiyon: raporlar
+- raporId (string) → Otomatik ID
+- hedefTip (string) → icerik, yorum, kullanici
+- hedefId (string) → Raporlanan öğe ID
+- raporlayanId (string) → Kullanıcı UID
+- neden (string) → Rapor nedeni
+- tarih (timestamp) → Rapor tarihi
+- durum (string) → incelemede, işlem yapıldı
+- itiraz (boolean) → Hızlı itiraz durumu
+
+2. İlişkiler
+•	Bir kullanıcı → birden çok Kalem oluşturabilir.
+•	Bir Kalem → birden çok içerik barındırır.
+•	Bir içerik → birden çok oy ve yorum alabilir.
+•	Bir yorum → başka bir yoruma cevap olabilir (iplik yapısı).
+•	Bir kullanıcı → birden çok mesaj gönderebilir.
+•	Bir rapor → içerik, yorum veya kullanıcıya ait olabilir.
+3. Performans ve İndeksleme
+•	Sık sorgulanan alanlar (popularityScore, netBegeniOrani) için bileşik indeksler.
+•	Mesajlarda seen alanına indeks → okunmamış mesaj sorgularını hızlandırır.
+•	Oylar koleksiyonunda (icerikId, kullaniciId) bileşik indeks → tek oy kuralı kontrolü.
+4. Güvenlik Kuralları (Security Rules)
+•	Kullanıcı sadece kendi mesajını okuyabilir/gönderebilir.
+•	Oylar koleksiyonunda aynı kullanıcı + içerik için tekrar oy engeli.
+•	Raporlar sadece moderatör/admin tarafından durum güncellenebilir.
+•	Medya yükleme boyut ve tip kısıtlamaları (Storage Rules).
+
+---
+
+Maliyet Optimizasyon Notları:
+
+- Firestore:
+    - Gerçek zamanlı listener'ları (onSnapshot) sadece gerekli ekranlarla sınırlandırın; global/kalıcı listener'lar okuma maliyetini artırır.
+    - Sık erişilen verileri denormalize ederek okuma sayısını azaltın; yazma maliyetini batch yazmalarla optimize edin.
+    - Gereksiz veya otomatik oluşturulan indeksleri kaldırın; özel indeksleri yalnızca yaygın sorgular için ekleyin.
+    - TTL (time-to-live) kuralları ile eski verileri otomatik silin; küçük, çok sayıda belge yerine gerektiğinde daha büyük belgeler tercih edin.
+
+- Cloud Storage:
+    - Yüklemelerden önce istemci tarafı sıkıştırma (WebP/AVIF, video bitrate düşürme) zorunlu hale getirin; maksimum çözünürlüğü (fotoğraf 1080p, video 720p) politika olarak belirleyin.
+    - Yaşam döngüsü (lifecycle) kuralları ile eski veya kullanım dışı medyayı arşivle/sil.
+    - CDN (Cloud CDN veya üçüncü taraf) entegrasyonu ile egress maliyetlerini azaltın.
+    - Direct upload (signed URLs) ile sunucu tarafı işlem ve fonksiyon tetiklemelerini azaltın.
+
+- Cloud Functions:
+    - Fonksiyon timeout ve hafıza ayarlarını en düşük gerekli seviyeye çekin; yüksek bellek ve uzun timeout maliyeti artırır.
+    - Yüksek frekanslı tetiklemeleri batch işlerine çevirin (Pub/Sub + toplu iş), sık küçük çağrılardan kaçının.
+    - Log seviyesini düşürün ve log örnekleme (sampling) kullanın; gereksiz loglama maliyetini azaltır.
+    - Fonksiyonları iş mantığına göre birleştirip, gereksiz küçük fonksiyonlardan kaçının.
+
+- İzleme ve Bütçe:
+    - Firestore okumaları/yazmaları, Storage GB ve egress, Functions çağrıları için billing alerts (günlük/haftalık) kurun.
+    - DAU ve istek profiline göre 1k/5k/20k senaryoları ile maliyet simülasyonları planlayın.
+
+- Eylem Önerileri (plan güncellemeleri):
+    - Planlara "Maliyet Hesaplaması" bölümü ekleyin; DAU, ort. istek, ort. dosya boyutu gibi varsayımlar yazılsın.
+    - UI/UX planına medya yükleme kısıtları ve sıkıştırma yönergeleri ekleyin.
+    - Geliştirme aşamalarına "maliyet testleri" (yük testleri ve fiyatlandırma simülasyonları) ekleyin.

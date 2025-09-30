@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="375" height="812" viewBox="0 0 375 812" role="img" aria-label="ANSEL kalem içeriği listesi ekranı">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="60%" stop-color="#CFEFF6"/>
+      <stop offset="100%" stop-color="#BEEEDC"/>
+    </linearGradient>
+
+    <!-- Accent gradient -->
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4A90E2"/>
+      <stop offset="100%" stop-color="#50C878"/>
+    </linearGradient>
+
+    <!-- Soft shadow -->
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#bgGrad)"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="375" height="64" fill="#FFFFFF" filter="url(#softShadow)"/>
+  <text x="20" y="40" font-family="Inter" font-size="18" fill="#4A90E2">‹</text>
+  <text x="187.5" y="40" text-anchor="middle" font-family="Inter" font-size="16" font-weight="700" fill="#2D3748">
+    Ankara'nın gün batımı
+  </text>
+
+  <!-- Content item 1 -->
+  <g transform="translate(18,80)">
+    <rect width="339" height="140" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <circle cx="36" cy="28" r="16" fill="#E6F7FF"/>
+    <text x="60" y="24" font-family="Inter" font-size="14" font-weight="600" fill="#2D3748">Ayşe</text>
+    <text x="60" y="44" font-family="Inter" font-size="12" fill="#718096">2 saat önce</text>
+    <rect x="16" y="60" width="307" height="60" rx="8" fill="#E6F7FF"/>
+    <text x="24" y="100" font-family="Inter" font-size="13" fill="#4A5568">Gün batımı fotoğrafı (placeholder)</text>
+  </g>
+
+  <!-- Content item 2 -->
+  <g transform="translate(18,230)">
+    <rect width="339" height="120" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <circle cx="36" cy="28" r="16" fill="#E6F7FF"/>
+    <text x="60" y="24" font-family="Inter" font-size="14" font-weight="600" fill="#2D3748">Ahmet</text>
+    <text x="60" y="44" font-family="Inter" font-size="12" fill="#718096">Dün</text>
+    <text x="16" y="72" font-family="Inter" font-size="14" fill="#2D3748">
+      “Benim için en güzel gün batımı Eymir’de oluyor.”
+    </text>
+  </g>
+
+  <!-- Content item 3 -->
+  <g transform="translate(18,370)">
+    <rect width="339" height="140" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <circle cx="36" cy="28" r="16" fill="#E6F7FF"/>
+    <text x="60" y="24" font-family="Inter" font-size="14" font-weight="600" fill="#2D3748">Zeynep</text>
+    <text x="60" y="44" font-family="Inter" font-size="12" fill="#718096">3 gün önce</text>
+    <rect x="16" y="60" width="307" height="60" rx="8" fill="#E6F7FF"/>
+    <text x="24" y="100" font-family="Inter" font-size="13" fill="#4A5568">Yağmur sonrası gökyüzü (placeholder)</text>
+  </g>
+
+  <!-- Floating add content button -->
+  <g transform="translate(295,700)">
+    <circle cx="40" cy="40" r="40" fill="url(#accentGrad)" filter="url(#softShadow)"/>
+    <text x="40" y="48" text-anchor="middle" font-family="Inter" font-size="28" font-weight="700" fill="#FFFFFF">+</text>
+  </g>
+
+  <!-- Accessibility -->
+  <title>ANSEL kalem içeriği listesi ekranı</title>
+  <desc>Seçilen kalemin altındaki içeriklerin listesi: kullanıcı adı, zaman, görsel veya metin içerik kartları, sağ altta yeni içerik ekleme butonu</desc>
+</svg>

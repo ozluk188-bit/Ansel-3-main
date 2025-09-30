@@ -1,0 +1,78 @@
+ANSEL - 29/09/2025 tarihinde yapılanlar
+
+Özet
+-----
+Bugün projeye "sunucu tarafı denormalizasyon" ve istemci uyarlaması eklendi. Amaç: içerik listelerinin kullanıcı (oluşturan) bilgilerini hızlı ve güvenilir şekilde göstermesini sağlamak, Firestore `in` sorgusu ile ilgili limit ve maliyet/performans sorunlarını ortadan kaldırmaktır. Backfill yapılmadı (proje sıfırdan başlıyor). Aşağıda yapılan değişikliklerin detayı, test adımları ve önerilen sonraki işler yer almaktadır.
+
+Yapılan değişiklikler (dosya bazlı)
+-----------------------------------
+1) functions/src/populateCreatorFields.ts (yeni)
+   - Tür: Cloud Function (Firestore trigger)
+   - Trigger: onCreate -> 'icerikler/{docId}'
+   - İşlev: Yeni bir içerik (icerik) oluşturulduğunda, ilgili kullanıcının (`kullanicilar/{uid}`) `ad` ve `profilFotoURL` alanlarını alıp içerik belgesindeki `olusturanAdi` ve `olusturanAvatar` alanlarına yazar (overwrite). Bu, istemcinin güvenilir ve server-temelli bilgiler kullanmasını sağlar.
+
+2) functions/src/propagateProfileChange.ts (yeni)
+   - Tür: Cloud Function (Firestore trigger)
+   - Trigger: onUpdate -> 'kullanicilar/{uid}'
+   - İşlev: Kullanıcı profili güncellendiğinde (ad veya profil fotoğrafları değiştiğinde), o kullanıcıya ait `icerikler` belgelerini batch (<=500) şeklinde günceller; böylece denormalize bilgiler tutarlı kalır.
+
+3) functions/src/index.ts (güncellendi)
+   - Yeni fonksiyonların (populateCreatorFields, propagateProfileChange) export edilmesi eklendi. Mevcut helloWorld fonksiyonu korunmuştur.
+
+4) app/kalem/[id].tsx (güncellendi)
+   - Tür: istemci (React Native / Expo)
+   - Değişiklik: Daha önce `kullanicilar` koleksiyonuna `where('__name__', 'in', userIds)` şeklinde yapılan sorgu ve `getDocs` çağrısı kaldırıldı.
+   - Yeni davranış: `icerikler` belgelerinden doğrudan denormalize edilmiş `olusturanAdi` ve `olusturanAvatar` alanları kullanılıyor. Böylece istemci artık ek kullanıcı sorgusu yapmıyor; latency ve Firestore okuma sayısı azalacak.
+
+Not: `getDocs` importu istemci dosyasından kaldırıldı.
+
+Neden bu değişiklikler yapıldı
+-----------------------------
+- Firestore `in` sorgusu maksimum 10 eleman limitine sahiptir; büyük listelerde bu hata veya eksik veri problemine yol açar.
+- Ek olarak, istemci tarafı kullanıcı sorguları listeleme sırasında gereksiz okumalara ve ekstra latency'ye sebep olur. Sunucu tarafında denormalize ederek okunma maliyeti ve karmaşıklık azaltıldı.
+- Sunucu tarafı (Cloud Functions) ile denormalizasyon yapmak, istemci kaynaklı sahte isim/avatarlara karşı güven verir: kullanıcı bilgileri güvenilir şekilde `kullanicilar` koleksiyonundan alınır.
+
+Test & doğrulama (önerilen adımlar)
+-----------------------------------
+1) Emulator'da fonksiyon testi (önerilir)
+   - functions dizinine gidin ve emulator'ı başlatın:
+
+```powershell
+# functions dizininde çalıştırın
+npm run serve
+```
+
+   - Ardından uygulamayı (Expo) çalıştırıp aşağıdakileri deneyin:
+     a) Yeni bir içerik oluşturun (metin veya fotoğraf). Emulator'da `icerikler` koleksiyonuna bakın; belge oluşturulduktan kısa süre sonra `olusturanAdi`/`olusturanAvatar` alanlarının eklendiğini görmelisiniz.
+     b) Bir kullanıcı profili (`kullanicilar/{uid}`) güncelleyin (ör. ad veya profilFotoURL değiştirin). Fonksiyon tetiklenecek ve ilgili kullanıcının içerik belgelerindeki denormalize alanlar güncellenecektir.
+
+2) İstemci doğrulaması
+   - `app/kalem/[id].tsx` dosyası artık `icerikler` belgelerinden `olusturanAdi`/`olusturanAvatar` alanlarını gösteriyor. Uygulamada ilgili Kalem detayını açtığınızda kartlarda bu alanların gösterildiğini doğrulayın.
+
+Deploy adımları
+---------------
+- Fonksiyonları deploy etmeden önce emulator ile test edin. Deploy için (functions dizininde):
+
+```powershell
+npm run deploy
+```
+
+- Uygulamayı production ortamında kullanmadan önce Firestore Security Rules ve Storage Rules'ı kontrol edin.
+
+Riskler ve dikkat edilecekler
+----------------------------
+- Profil güncellemeleri büyük kullanıcılar için çok sayıda `icerikler` güncellemesi tetikleyebilir; bu durumda Cloud Function maliyetleri artabilir. İleride bu propagation işini queue (Pub/Sub) veya throttled batch job olarak tasarlamak maliyet/perf dengesini iyileştirir.
+- Backfill yapılmadı (istek doğrultusunda: proje sıfırdan başlıyor). Eğer ileride eski verileri güncellemeniz gerekirse `functions` içinde veya ayrı bir script ile backfill yapılabilir.
+
+Sonraki önerilen adımlar
+------------------------
+1) Emulator testi (öncelik) — doğrulama ve küçük düzeltmeler için.
+2) Fonksiyonları production'a deploy etmeden önce Firestore Rules testleri (emulator ile) çalıştırın.
+3) Monitoring / billing alerts kurun (ilk iki hafta için fonksiyon invocation ve read/write metriklerini yakından izleyin).
+4) İleride: profil propagation işini büyük kullanıcılar için Pub/Sub queue'ya taşımak veya güncelleme sırasında sadece meta timestamp'ı güncelleyip arka planda batch ile işlem yapmak.
+
+İletişim
+--------
+Bu değişikliklerle ilgili daha detaylı bir rapor veya fonksiyon test çıktıları isterseniz, emulator çıktısını çalıştırıp logları ekleyebilirim.
+
+-- Son

@@ -1,0 +1,90 @@
+# ANSEL UI/UX Tasarım Planı
+*Genel Prensipler*: Modern minimalist tasarım. Renk paleti: Ana (#FFFFFF beyaz), Arka (#F8FAFC açık mavi-gri), Accent (#4A90E2 hafif mavi), Başarı (#50C878 yeşil), Uyarı (#FF9500 turuncu). Tipografi: Inter font ailesi (Başlık 24-32px bold, Body 14-16px regular). İkonlar: Feather Icons (hafif, line-style). Animasyonlar: Reanimated ile yumuşak geçişler (300ms ease-in-out). Karanlık mod: Otomatik (sistem bazlı), koyu tonlar (#1A1A1A ana, #2D3748 arka). Erişilebilirlik: WCAG AA uyumlu (kontrast 4.5:1, ARIA labels). Boşluk: 16-24px margin/padding, 8px grid sistemi.
+
+## Aşama 1: Temel Yapı ve Arayüz (MVP)
+**Odak**: Temiz onboarding, basit navigasyon, huzurlu içerik akışı.
+- **Onboarding Ekranı**: 3 slayt carousel (Sıralı animasyonlu). 1. "ANSEL'e Hoş Geldin" – Kalem kavramı animasyonu (kalem çizimi). 2. "İlk Kalem'ini Oluştur" – Buton CTA. 3. "Başla" – Giriş butonu. Arka: Pastel gradient (mavi-yeşil), ikonlu.
+- **Giriş/Kayıt Ekranı**: Minimal form (e-posta/şifre, Google/Apple butonları). Anonim giriş: "Hemen Keşfet" butonu. Hata mesajları: Hafif toast (yeşil/yeşil).
+- **Ana Tab Navigasyon**: Bottom tab bar (React Navigation). Sekmeler: 
+  - **Kalemler** (ev ikonu): Liste view, her Kalem kartı (yuvarlak köşeli, 16px padding, başlık 20px bold, içerik önizleme).
+  - **Mesajlar** (konuşma ikonu): Mesaj listesi, avatar + son mesaj snippet.
+  - **Profil** (kişi ikonu): Dairesel avatar, ad + bio.
+- **Kalem Oluşturma Ekranı**: Modal (yarı ekran). Başlık input (otomatik tamamlama), medya picker (galeri/kamera butonları, Expo ImagePicker ile). "Paylaş" butonu (mavi, scale animasyonu).
+- **Kalem Detay Ekranı**: Scrollable feed. İçerik kartları (foto/video lazy load, FastImage ile). Üstte Kalem başlığı (gradient badge).
+- **Mesajlaşma Ekranı**: Chat bubble'lar (sağ/sol align, yuvarlak). Input bar altta (emoji picker, medya butonu). "Yazıyor..." indicator (hafif pulse animasyonu).
+- **Profil Ekranı**: Üstte avatar + ad (büyük, ortalı). Altında istatistikler (kalem sayısı, beğeni – kartlar halinde).
+- **Bileşenler**: 
+  - Kart: Beyaz bg, 8px border-radius, gölge yok (flat design).
+  - Buton: Outline/filled, 12px padding, ripple efekt.
+  - Loader: Hafif spinner (mavi, 3 dot'lu).
+**Mockup Önerisi**: Figma'da 375x812 (iPhone) prototip, light/dark switch.
+
+## Aşama 2: Etkileşim ve Keşif
+**Odak**: Etkileşimli feedback'ler, akıcı keşif.
+- **Keşfet Sekmesi**: Grid/list toggle (animasyonlu switch). Popüler Kalem'ler carousel (horizontal scroll, auto-play yok). Arama bar: Üst sticky, placeholder "Kalem ara...".
+- **İçerik Kartı Güncellemesi**: Beğeni butonları (👍👎, tap'te scale + renk değişimi). Net oran progress bar (yeşil-kırmızı gradient).
+- **Yorum Ekranı**: Thread view (nested replies, indent ile). Yorum input: Altta floating, "Yorum Yap" butonu. Oylama: Yıldız-like (tap animasyonu).
+- **Takip/Kaydet Butonu**: Kalem detayında kalp ikonu (filled outline animasyon).
+- **Bileşenler**:
+  - Progress Bar: İnce (4px height), yumuşak renk geçişi.
+  - Thread List: Nested list, collapse/expand toggle.
+**Mockup Önerisi**: Keşfet sayfası flow (arama → sonuçlar → detay).
+
+## Aşama 3: Moderasyon ve Güvenlik
+**Odak**: Güven verici, non-intrusive uyarılar.
+- **Raporlama Modal**: Swipe-up sheet. Neden seçimi (radio buttons), "Gönder" butonu. Onay toast: "Raporunuz incelendi" (yeşil checkmark).
+- **İtiraz Butonu**: Raporlanmış içerikte kırmızı badge, tap'te mini-form.
+- **Filtre Uyarı**: Kalem oluşturmada kırmızı toast (argo için), alternatif öneri.
+- **Moderasyon Paneli** (Admin): Sidebar (web'de), liste view raporlar (status badges: mavi/yeşil/kırmızı).
+- **Bileşenler**:
+  - Toast: Bottom slide-up, 3sn auto-hide.
+  - Badge: Yuvarlak, renkli (status bazlı).
+**Mockup Önerisi**: Rapor flow (içerik → rapor → onay).
+
+## Aşama 4: Kullanıcı Etkileşimi ve Oyunlaştırma
+**Odak**: Ödüllendirici, motive edici unsurlar.
+- **Rozet Ekranı**: Profil'de grid (daire ikonlar, tooltip hover). Kazanma animasyonu: Confetti burst (hafif, Lottie ile).
+- **Liderlik Tablosu**: Scrollable liste (yerel/global tabs). Sıralama: Avatar + ad + puan (rank badge'ler: altın/gümüş).
+- **Davet Ekranı**: QR/share butonları, "Davet Et" modal (sosyal medya picker).
+- **Profil Özelleştirme**: Edit modal – tema picker (swatches), bio textarea, link input'lar.
+- **Bileşenler**:
+  - Confetti: Kısa burst, sadece başarıda.
+  - Rank Badge: Gradient circle.
+**Mockup Önerisi**: Profil edit flow + rozet showcase.
+
+## Aşama 5: Gelişmiş Keşif ve Bildirimler
+**Odak**: Kişiselleştirilmiş, akıcı akış.
+- **Öneri Carousel**: "Sana Özel" section, etiket bazlı kartlar (fade-in animasyon).
+- **Bildirim Sekmesi**: Liste (bell ikonu tab), gruplu (yeni/beğeni/yorum). Özelleştirme: Switch'ler modalda.
+- **Bildirim Toast**: Push geldiğinde in-app badge + haptic feedback.
+- **Bileşenler**:
+  - Switch Toggle: Smooth slide.
+  - Grouped List: Section headers (gri underline).
+**Mockup Önerisi**: Bildirim listesi + ayarlar.
+
+## Aşama 6: Analitik, Performans ve Erişilebilirlik
+**Odak**: Seamless, inclusive deneyim.
+- **Yükleme States**: Skeleton loaders (gri placeholders, shimmer animasyon).
+- **Karanlık Mod Switch**: Profil ayarlarında toggle, instant theme change.
+- **Erişilebilirlik Ekranları**: VoiceOver labels (tüm butonlarda), high-contrast toggle (ayarlar modal).
+- **Bileşenler**:
+  - Skeleton: Hafif gri, pulse animasyon.
+  - Theme Switch: Sun/moon ikon, rotate animasyon.
+**Mockup Önerisi**: Dark mode karşılaştırması + skeleton demo.
+
+## Aşama 7: Monetizasyon ve Ek Özellikler
+**Odak**: Non-disruptive entegrasyon.
+- **Reklam Slot'ları**: Feed'de native ads (sponsorlu Kalem badge, swipe away).
+- **Premium Upsell**: Profil'de gold badge, modal ("Reklamsız Deneyim" CTA).
+- **Özel Kalem Davet**: Locked kart, "Katıl" butonu (QR scan).
+- **Bileşenler**:
+  - Ad Card: Subtle border, "Sponsorlu" tag.
+  - Upsell Modal: Centered, yumuşak backdrop blur.
+**Mockup Önerisi**: Feed'de ad entegrasyonu.
+
+## Genel Araçlar ve Uygulama
+- **Tasarım Tool**: Figma (components library kur, variants ile light/dark).
+- **Prototipleme**: Framer Motion benzeri animasyonlar (Reanimated ile kodda).
+- **Test**: Accessibility scanner (Figma plugin), user testing (Lookback.io).
+- **Stil Guide**: CSS-in-JS (Styled Components) ile React Native'de uygula.
+*Toplam Mockup Sayısı*: 15+ ekran, interaktif prototip.

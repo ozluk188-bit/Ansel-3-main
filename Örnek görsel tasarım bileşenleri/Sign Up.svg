@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="375" height="812" viewBox="0 0 375 812" role="img" aria-label="ANSEL kayıt ol ekranı">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="60%" stop-color="#CFEFF6"/>
+      <stop offset="100%" stop-color="#BEEEDC"/>
+    </linearGradient>
+
+    <!-- Accent gradient -->
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4A90E2"/>
+      <stop offset="100%" stop-color="#50C878"/>
+    </linearGradient>
+
+    <!-- Soft shadow -->
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#bgGrad)"/>
+
+  <!-- Logo -->
+  <circle cx="187.5" cy="100" r="36" fill="#FFFFFF" filter="url(#softShadow)"/>
+  <text x="187.5" y="108" text-anchor="middle" font-family="Inter, Arial" font-size="26" font-weight="700" fill="#4A90E2">
+    A
+  </text>
+
+  <!-- Title -->
+  <text x="187.5" y="170" text-anchor="middle" font-family="Inter, Arial" font-size="22" font-weight="700" fill="#2D3748">
+    Kayıt Ol
+  </text>
+
+  <!-- Input fields -->
+  <g transform="translate(40,210)">
+    <rect width="295" height="52" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <text x="16" y="32" font-family="Inter" font-size="14" fill="#718096">Ad Soyad</text>
+  </g>
+
+  <g transform="translate(40,280)">
+    <rect width="295" height="52" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <text x="16" y="32" font-family="Inter" font-size="14" fill="#718096">E-posta</text>
+  </g>
+
+  <g transform="translate(40,350)">
+    <rect width="295" height="52" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <text x="16" y="32" font-family="Inter" font-size="14" fill="#718096">Şifre</text>
+  </g>
+
+  <g transform="translate(40,420)">
+    <rect width="295" height="52" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <text x="16" y="32" font-family="Inter" font-size="14" fill="#718096">Şifre (Tekrar)</text>
+  </g>
+
+  <!-- Sign Up button -->
+  <g transform="translate(40,500)">
+    <rect width="295" height="52" rx="12" fill="url(#accentGrad)"/>
+    <text x="147.5" y="34" text-anchor="middle" font-family="Inter" font-size="16" font-weight="700" fill="#FFFFFF">
+      Kayıt Ol
+    </text>
+  </g>
+
+  <!-- Divider -->
+  <g transform="translate(40,580)">
+    <line x1="0" y1="0" x2="295" y2="0" stroke="#CBD5E0" stroke-width="1"/>
+    <rect x="120" y="-12" width="55" height="24" fill="url(#bgGrad)"/>
+    <text x="147.5" y="6" text-anchor="middle" font-family="Inter" font-size="12" fill="#718096">veya</text>
+  </g>
+
+  <!-- Social sign up -->
+  <g transform="translate(40,610)">
+    <rect width="295" height="44" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <text x="147.5" y="28" text-anchor="middle" font-family="Inter" font-size="14" fill="#2D3748">
+      Google ile kayıt ol
+    </text>
+  </g>
+
+  <g transform="translate(40,664)">
+    <rect width="295" height="44" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <text x="147.5" y="28" text-anchor="middle" font-family="Inter" font-size="14" fill="#2D3748">
+      Apple ile kayıt ol
+    </text>
+  </g>
+
+  <!-- Already have account -->
+  <text x="187.5" y="740" text-anchor="middle" font-family="Inter" font-size="14" fill="#4A5568">
+    Zaten hesabın var mı?
+    <tspan fill="#4A90E2" font-weight="600"> Giriş Yap</tspan>
+  </text>
+
+  <!-- Accessibility -->
+  <title>ANSEL kayıt ol ekranı</title>
+  <desc>Kayıt ol ekranı: ad soyad, e-posta, şifre alanları, kayıt ol butonu, sosyal kayıt seçenekleri ve giriş yap linki</desc>
+</svg>

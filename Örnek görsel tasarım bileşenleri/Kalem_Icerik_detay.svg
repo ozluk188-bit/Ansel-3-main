@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="375" height="812" viewBox="0 0 375 812" role="img" aria-label="ANSEL kalem içeriği ekranı">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="60%" stop-color="#CFEFF6"/>
+      <stop offset="100%" stop-color="#BEEEDC"/>
+    </linearGradient>
+
+    <!-- Accent gradient (blue -> green) -->
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4A90E2"/>
+      <stop offset="100%" stop-color="#50C878"/>
+    </linearGradient>
+
+    <!-- Soft shadow -->
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#bgGrad)"/>
+
+  <!-- Header: back, title badge, menu -->
+  <g transform="translate(0,0)">
+    <rect x="0" y="0" width="375" height="64" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <!-- Back -->
+    <text x="20" y="40" font-family="Inter" font-size="18" fill="#4A90E2">‹</text>
+    <!-- Title badge -->
+    <rect x="56" y="18" width="263" height="32" rx="16" fill="url(#accentGrad)"/>
+    <text x="187.5" y="40" text-anchor="middle" font-family="Inter" font-size="14" font-weight="700" fill="#FFFFFF">
+      Ankara'nın gün batımı
+    </text>
+    <!-- Menu -->
+    <text x="350" y="40" font-family="Inter" font-size="18" fill="#A0AEC0">⋯</text>
+  </g>
+
+  <!-- Author row -->
+  <g transform="translate(18,76)">
+    <rect width="339" height="56" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <circle cx="44" cy="28" r="20" fill="#E6F7FF"/>
+    <text x="74" y="24" font-family="Inter" font-size="15" font-weight="600" fill="#2D3748">Ayşe</text>
+    <text x="74" y="44" font-family="Inter" font-size="12" fill="#718096">2 saat önce • Çankaya</text>
+    <!-- Follow button -->
+    <rect x="250" y="14" width="76" height="28" rx="14" fill="none" stroke="#4A90E2" stroke-width="1.6"/>
+    <text x="288" y="32" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill="#4A90E2">Takip Et</text>
+  </g>
+
+  <!-- Media card -->
+  <g transform="translate(18,142)">
+    <rect width="339" height="190" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <rect x="12" y="12" width="315" height="166" rx="10" fill="#E6F7FF"/>
+    <!-- Placeholder caption -->
+    <text x="24" y="156" font-family="Inter" font-size="12" fill="#4A5568">Gün batımı fotoğrafı (placeholder)</text>
+  </g>
+
+  <!-- Text content -->
+  <g transform="translate(18,342)">
+    <rect width="339" height="96" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <text x="16" y="28" font-family="Inter" font-size="14" fill="#2D3748">
+      Kızılay'da akşam ışıkları yavaşça sönüyor; gökyüzü pastel tonlara bürünüyor.
+    </text>
+    <text x="16" y="52" font-family="Inter" font-size="14" fill="#2D3748">
+      Senin şehrinde gün batımı nerede en güzel?
+    </text>
+    <text x="16" y="76" font-family="Inter" font-size="12" fill="#A0AEC0">Etiketler: #Ankara #günbatımı #şehir</text>
+  </g>
+
+  <!-- Interaction bar -->
+  <g transform="translate(18,446)">
+    <rect width="339" height="52" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <!-- Like -->
+    <rect x="12" y="8" width="74" height="36" rx="18" fill="#EDF2F7"/>
+    <text x="24" y="31" font-family="Inter" font-size="16" fill="#4A90E2">👍</text>
+    <text x="48" y="31" font-family="Inter" font-size="12" fill="#2D3748">120</text>
+    <!-- Dislike -->
+    <rect x="94" y="8" width="74" height="36" rx="18" fill="#EDF2F7"/>
+    <text x="106" y="31" font-family="Inter" font-size="16" fill="#FF9500">👎</text>
+    <text x="130" y="31" font-family="Inter" font-size="12" fill="#2D3748">8</text>
+    <!-- Save -->
+    <rect x="176" y="8" width="74" height="36" rx="18" fill="#EDF2F7"/>
+    <text x="188" y="31" font-family="Inter" font-size="16" fill="#2D3748">🔖</text>
+    <text x="212" y="31" font-family="Inter" font-size="12" fill="#2D3748">Kaydet</text>
+    <!-- Share -->
+    <rect x="258" y="8" width="69" height="36" rx="18" fill="#EDF2F7"/>
+    <text x="270" y="31" font-family="Inter" font-size="16" fill="#2D3748">⤴︎</text>
+    <text x="292" y="31" font-family="Inter" font-size="12" fill="#2D3748">Paylaş</text>
+  </g>
+
+  <!-- Comments header -->
+  <text x="18" y="520" font-family="Inter" font-size="14" font-weight="700" fill="#2D3748">Yorumlar</text>
+
+  <!-- Comment 1 -->
+  <g transform="translate(18,536)">
+    <rect width="339" height="72" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <circle cx="30" cy="36" r="16" fill="#E6F7FF"/>
+    <text x="54" y="26" font-family="Inter" font-size="13" font-weight="600" fill="#2D3748">Ahmet</text>
+    <text x="54" y="46" font-family="Inter" font-size="13" fill="#4A5568">Eymir'de gün batımı efsane!</text>
+    <text x="320" y="26" text-anchor="end" font-family="Inter" font-size="11" fill="#A0AEC0">1 saat</text>
+  </g>
+
+  <!-- Comment 2 (nested reply look) -->
+  <g transform="translate(36,614)">
+    <rect width="321" height="64" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <circle cx="30" cy="32" r="14" fill="#E6F7FF"/>
+    <text x="54" y="26" font-family="Inter" font-size="13" font-weight="600" fill="#2D3748">Zeynep</text>
+    <text x="54" y="44" font-family="Inter" font-size="13" fill="#4A5568">Tam da öyle, renkler pastel oluyor.</text>
+  </g>
+
+  <!-- Comment 3 -->
+  <g transform="translate(18,686)">
+    <rect width="339" height="64" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <circle cx="30" cy="32" r="16" fill="#E6F7FF"/>
+    <text x="54" y="26" font-family="Inter" font-size="13" font-weight="600" fill="#2D3748">Musa</text>
+    <text x="54" y="44" font-family="Inter" font-size="13" fill="#4A5568">Fotoğrafını paylaşırsan sevinirim.</text>
+  </g>
+
+  <!-- Comment input -->
+  <g transform="translate(0,754)">
+    <rect width="375" height="58" fill="#FFFFFF" filter="url(#softShadow)"/>
+    <rect x="16" y="10" width="280" height="38" rx="19" fill="#EDF2F7"/>
+    <text x="30" y="34" font-family="Inter" font-size="13" fill="#718096">Yorum yaz...</text>
+    <rect x="304" y="10" width="55" height="38" rx="19" fill="url(#accentGrad)"/>
+    <text x="331.5" y="34" text-anchor="middle" font-family="Inter" font-size="14" font-weight="700" fill="#FFFFFF">Gönder</text>
+  </g>
+
+  <!-- Accessibility -->
+  <title>ANSEL kalem içeriği ekranı</title>
+  <desc>Başlık badge’i, yazar kartı, görsel içerik, metin, beğeni/kaydet/paylaş etkileşimleri ve yorumlar listesi ile yorum yazma alanı</desc>
+</svg>

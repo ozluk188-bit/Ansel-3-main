@@ -1,0 +1,239 @@
+# “ANSEL” Uygulaması - Aşamalı Geliştirme Planı
+*Uygulama Türkçe dilinde olacak. React Native + Expo ile Android, iOS ve Web desteği sağlanacak. Plan, basitten karmaşığa doğru ilerler.*
+
+## Aşama 1: Temel Yapı ve Arayüz (MVP - Minimum Viable Product)
+**Hedef**: Kullanıcıların Kalem oluşturabildiği, 1’e 1 mesajlaşabildiği ve birbirlerinin profillerini görüntüleyebildiği temel bir uygulama.
+**Süre Tahmini**: 4-6 hafta
+**Özellikler**:
+- **Kalem Kavramı**:
+  - Kullanıcılar belirli bir konu etrafında Kalem oluşturabilir (başlık max 100 karakter, benzersiz).
+  - Kalem’ler herkese açık, anonim kullanıcılar sadece görüntüleyebilir.
+  - Basit metin tabanlı Kalem listesi.
+- **Kalem İçerikleri**:
+  - Fotoğraf, yazı desteği.
+  - İçerik paylaşımı sadece kayıtlı kullanıcılar için.
+- **Mesajlaşma Özelliği**:
+  - 1’e 1 gerçek zamanlı mesajlaşma (Firestore tabanlı).
+  - Metin, fotoğraf, video, ses, emoji desteği.
+  - Okundu bilgisi ve “yazıyor…” göstergesi.
+- **Üyelik ve Giriş Sistemi**:
+  - FirebaseUI Auth ile e-posta/şifre ve anonim giriş.
+  - Anonim hesabı kalıcı hesaba bağlama mekanizması.
+- **Profil Görüntüleme**:
+  - Kullanıcı profili: Görünen ad, profil fotoğrafı, katılım tarihi.
+  - Basit profil ekranı (kendi profilini ve başkalarının profillerini görüntüleme).
+- **Arayüz**:
+  - React Navigation ile stack ve tab navigasyonu (Kalem listesi, mesajlaşma, profil sekmeleri).
+  - Basit UI bileşenleri (NativeBase ile Kalem listesi, mesajlaşma ekranı, profil ekranı).
+  - Platforma özel UX (mobilde tam ekran, webde yan panel).
+- **Medya Optimizasyonu**:
+  - Yükleme öncesi sıkıştırma: Resimler WebP, videolar 720p.
+  - Expo ImagePicker ve MediaLibrary ile medya yükleme.
+- **Teknik Mimari**:
+  - Firebase Authentication (e-posta/şifre, anonim giriş).
+  - Firebase Firestore:
+    - Koleksiyonlar: kullanicilar, kalemler, icerikler, mesajlar.
+    - Basit Security Rules (mesajlar sadece gönderen/alıcı tarafından okunabilir).
+  - Firebase Storage (medya dosyaları için).
+  - State yönetimi: Zustand (basit global durum yönetimi).
+  - Temel test: React Native Testing Library ve Jest ile birim testleri.
+**Veri Modeli**:
+- **kullanicilar**: uid, ad, profilFotoURL, email, katilimTarihi.
+- **kalemler**: kalemId, baslik, olusturanId, olusturmaTarihi, icerikSayisi, durum.
+- **icerikler**: icerikId, kalemId, olusturanId, tip, medyaURL, metin, olusturmaTarihi, durum.
+- **mesajlar**: mesajId, sohbetId, gonderenId, aliciId, tip, icerik, tarih, seen, durum.
+**Çıktılar**:
+- Kullanıcıların Kalem oluşturabildiği, içerik paylaşabildiği, mesajlaşabildiği ve profilleri görüntüleyebildiği temel bir uygulama.
+- Basit, işlevsel bir arayüz.
+**Zorluklar ve Çözümler**:
+- Firestore okuma/yazma maliyetleri: Sorguları sınırla (sayfalama ile veri çekme).
+- Kullanıcı deneyimi: Basit onboarding ekranı (ör. “İlk Kalem’ini oluştur!”).
+
+Maliyet Optimizasyon Notları (Aşamalara Özgü):
+
+- Aşama 1 (MVP):
+  - Gerçek zamanlı listener'ları sadece mesajlaşma ekranı gibi zorunlu alanlarla sınırlayın; Kalem listesi için sayfalama + pull-to-refresh kullanın.
+  - Medya yükleme boyutu ve format kısıtlarını UI'da zorunlu hale getirerek gereksiz Storage kullanımını azaltın.
+
+- Aşama 2 (Etkileşim):
+  - Oylar ve yorumlar için sık sorgulardan kaçının; sayısal özetler (aggregates) periyodik Cloud Function ile güncellensin.
+  - popularityScore hesaplamasını per içerik anlık değil, periyodik batch olarak çalıştırın.
+
+- Aşama 3+ (Moderasyon ve Ölçek):
+  - Cloud Vision ve otomatik moderasyon çağrılarını örnekleme ile azaltın; sadece raporlanan veya yüksek riskli içeriklerde çalıştırın.
+  - Moderasyon işlerini toplu job'lara çekerek fonksiyon çağrı sayısını düşürün.
+
+## Aşama 2: Etkileşim ve Keşif
+**Hedef**: Kalem’lere etkileşim (beğeni, yorum) ve temel keşif özellikleri eklemek.
+**Süre Tahmini**: 3-4 hafta
+**Özellikler**:
+- **Kalem İçerikleri**:
+   - Video, ses dosyası ve GIF desteği.
+  - Beğenme 👍 / Beğenmeme 👎 sistemi (anonim kullanıcılar hariç).
+  - Net Beğeni Oranı: beğeni / (beğeni + beğenmeme).
+  - Beğenmeme nedenleri (ör. “uygunsuz”) toplama.
+- **Yorumlar**:
+  - Yorum ekleme ve oylama.
+  - Reddit tarzı cevap (reply) sistemi ile tartışma iplikleri.
+  - Minimum 10 karakter sınırı.
+- **Keşfet ve Arama**:
+  - Popüler Kalem’ler (24 saat, 7 gün, tüm zamanlar).
+  - Anahtar kelime ile metin tabanlı arama.
+  - Çoklu sıralama: “En Popüler”, “Yeniler”, “En Çok Yorum Alan”.
+  - Trend algoritması: popularityScore = (beğeni + yorum) * yenilik_faktörü.
+- **Kullanıcı Etkileşimi**:
+  - Kalem takip sistemi.
+  - Koleksiyonlar (kaydetme özelliği).
+- **Arayüz**:
+  - Keşfet sekmesi (popüler Kalem’ler ve arama).
+  - Yorum iplikleri için akıcı UI (NativeBase ile).
+  - Lazy loading ile Kalem ve içerik listeleri.
+- **Teknik Mimari**:
+  - Firestore koleksiyonları:
+    - **oylar**: icerikId, kullaniciId, oy, neden, tarih.
+    - **yorumlar**: yorumId, icerikId, kullaniciId, metin, ustYorumId, olusturmaTarihi, begeniSayisi, durum.
+  - Security Rules: Tek oy kuralı, yorum erişim kısıtlamaları.
+  - Firebase Cloud Functions: popularityScore hesaplama.
+  - İndeksleme: kalemId + netBegeniOrani, kalemId + olusturmaTarihi.
+**Veri Modeli**:
+- **oylar**: icerikId, kullaniciId, oy, neden, tarih.
+- **yorumlar**: yorumId, icerikId, kullaniciId, metin, ustYorumId, olusturmaTarihi, begeniSayisi, durum.
+**Çıktılar**:
+- Kullanıcılar içeriklere beğeni/y yorum yapabilir, Kalem’leri keşfedebilir ve kaydedebilir.
+- Keşfet sekmesiyle daha etkileşimli bir deneyim.
+**Zorluklar ve Çözümler**:
+- Performans: Lazy loading ve Firestore sayfalama ile veri yükünü azalt.
+- Spam yorumlar: Minimum karakter sınırı ve temel spam filtresi.
+
+## Aşama 3: Moderasyon ve Güvenlik
+**Hedef**: İçerik güvenliğini ve moderasyonu güçlendirmek.
+**Süre Tahmini**: 2-3 hafta
+**Özellikler**:
+- **Moderasyon ve Raporlama**:
+  - Uygunsuz içerik raporlama.
+  - Rapor durumu bildirimi (“Raporunuz inceleniyor”).
+  - Hızlı itiraz butonu.
+  - Sürekli ihlal yapanlara geçici paylaşım yasağı.
+  - Otomatik görsel filtre (Cloud Vision API).
+- **Kalem Oluşturma Kuralları**:
+  - Yerel dile özgü küfür/argo için dinamik filtre (Cloud Functions).
+  - Kalem’e özel kurallar (ör. “Sadece siyah-beyaz fotoğraflar”).
+- **Erişim ve Yetkiler**:
+  - Anonim kullanıcılar için CTA’lar (ör. “Beğeni için giriş yap”).
+  - Süper kullanıcı/moderatör rolleri için rehber ekran.
+- **Teknik Mimari**:
+  - Firestore koleksiyonu: **raporlar** (raporId, hedefTip, hedefId, raporlayanId, neden, tarih, durum, itiraz).
+  - Firebase Cloud Functions: Küfür/argo filtresi, rapor işleme otomasyonu.
+  - Security Rules: Rapor durumu sadece moderatör/admin tarafından güncellenebilir.
+  - Cloud Vision API entegrasyonu.
+  - Storage Security Rules (medya yükleme boyut/tip kısıtlamaları).
+**Veri Modeli**:
+- **raporlar**: raporId, hedefTip, hedefId, raporlayanId, neden, tarih, durum, itiraz.
+**Çıktılar**:
+- Güvenli bir topluluk platformu, moderasyon araçları ve kullanıcı raporlama sistemi.
+**Zorluklar ve Çözümler**:
+- Moderasyon yükü: Cloud Vision API ve topluluk moderatörleri ile yükü azalt.
+- Yanlış pozitifler: Hızlı itiraz butonu ile kullanıcı memnuniyetini koru.
+
+## Aşama 4: Kullanıcı Etkileşimi ve Oyunlaştırma
+**Hedef**: Kullanıcı bağlılığını artırmak için oyunlaştırma ve sosyal özellikler eklemek.
+**Süre Tahmini**: 3-4 hafta
+**Özellikler**:
+- **Kullanıcı Etkileşimi ve Oyunlaştırma**:
+  - Rozet ve seviye sistemi (“Gece Yarısı Kaşifi”, “Maratoncu”).
+  - Yerel (ülke/şehir bazlı) ve global liderlik tablosu.
+  - Boş sayfa tasarımı (ilk paylaşımı teşvik).
+  - “Arkadaşını Davet Et” özelliği ve rozet/puan ödülü.
+- **Sosyal Medya Entegrasyonu**:
+  - Kalem/içerik paylaşımı için WhatsApp, Instagram Stories, X (Expo Share API).
+- **Profil Özelleştirme**:
+  - Profil teması, biyografi, sosyal medya bağlantıları.
+- **Arayüz**:
+  - Liderlik tablosu ve rozet ekranı.
+  - Profil özelleştirme ekranı.
+  - Paylaşım butonları için UI entegrasyonu.
+- **Teknik Mimari**:
+  - Firestore güncellemeleri:
+    - **kullanicilar**: rozetler, profilTema, biyografi, sosyalMedyaBaglantilari.
+  - Firebase Cloud Functions: Rozet dağıtımı, liderlik tablosu hesaplama.
+  - Expo Share API entegrasyonu.
+**Veri Modeli**:
+- **kullanicilar**: rozetler, profilTema, biyografi, sosyalMedyaBaglantilari.
+**Çıktılar**:
+- Daha bağlı bir topluluk, viral büyüme için sosyal medya paylaşımı, özelleştirilmiş profiller.
+**Zorluklar ve Çözümler**:
+- Kullanıcı edinimi: Sosyal medya paylaşımı ve davet özelliğiyle organik büyüme.
+- Performans: Liderlik tablosu için önbellekleme (Redis).
+
+## Aşama 5: Gelişmiş Keşif ve Bildirimler
+**Hedef**: Keşif ve bildirim sistemlerini güçlendirmek.
+**Süre Tahmini**: 2-3 hafta
+**Özellikler**:
+- **Keşfet ve Arama**:
+  - Popüler etiket önerileri.
+  - Kullanıcıların takip ettiği etiketlere göre öneriler (Firebase Predictions).
+- **Bildirim Sistemi**:
+  - Takip edilen Kalem’lerde yeni paylaşım bildirimi.
+  - Beğeni, beğenmeme, yorum bildirimi.
+  - Kişiselleştirilmiş haftalık özet bildirimleri.
+  - Bildirim özelleştirme ve onboarding ekranı.
+- **Teknik Mimari**:
+  - Firebase Cloud Messaging: Push bildirimleri, A/B testi.
+  - Firebase Predictions: Etiket bazlı öneriler.
+  - Firestore: **kullanicilar** için bildirimTercihleri alanı.
+  - İndeksleme: etiketler + popularityScore.
+**Veri Modeli**:
+- **kullanicilar**: bildirimTercihleri.
+**Çıktılar**:
+- Daha iyi keşif deneyimi, kişiselleştirilmiş bildirimler.
+**Zorluklar ve Çözümler**:
+- Bildirim spam’i: Kullanıcı dostu onboarding ile bildirim kapatma seçeneği.
+
+## Aşama 6: Analitik, Performans ve Erişilebilirlik
+**Hedef**: Analitik, performans optimizasyonu ve erişilebilirlik eklemek.
+**Süre Tahmini**: 2-3 hafta
+**Özellikler**:
+- **Analitik ve İzleme**:
+  - Firebase Analytics ile kullanıcı davranış takibi.
+  - Kalem’lerde geçirilen süre ölçümü.
+  - Crashlytics ile hata raporları.
+  - Sentry ile funnel analysis.
+  - A/B testleri (UI, bildirim, push).
+- **Performans Optimizasyonu**:
+  - Firestore maliyet optimizasyonu (sayfalama, React Query ile önbellekleme).
+  - PWA çevrimdışı mod (AsyncStorage, Workbox).
+- **Erişilebilirlik**:
+  - Ekran okuyucu desteği ve yüksek kontrast modu (Accessibility API).
+- **Teknik Mimari**:
+  - Firebase Analytics ve Crashlytics entegrasyonu.
+  - Sentry entegrasyonu.
+  - React Query ile Firestore önbellekleme.
+  - Workbox ile PWA çevrimdışı desteği.
+  - Firebase Emulator Suite ile Security Rules testleri.
+**Çıktılar**:
+- Daha iyi performans, kapsamlı analitik, erişilebilir bir uygulama.
+**Zorluklar ve Çözümler**:
+- Firebase maliyetleri: React Query ve sayfalama ile okuma/yazma azaltımı.
+- Erişilebilirlik: Test için erişilebilirlik uzmanı danışmanlığı.
+
+## Aşama 7: Monetizasyon ve Ek Özellikler
+**Hedef**: Monetizasyon ve topluluk odaklı özellikleri eklemek.
+**Süre Tahmini**: 3-4 hafta
+**Özellikler**:
+- **Monetizasyon**:
+  - Reklam, premium üyelik (reklamsız, özel rozetler), sponsorlu Kalem’ler.
+- **Topluluk Odaklılık**:
+  - Özel (davetli) Kalem’ler.
+- **Teknik Mimari**:
+  - Firebase Cloud Functions: Reklam ve premium üyelik yönetimi.
+  - Firestore: Özel Kalem’ler için erişim kontrolü.
+**Çıktılar**:
+- Gelir modeli ve daha güçlü topluluk özellikleri.
+**Zorluklar ve Çözümler**:
+- Kullanıcı tepkisi: Reklamları rahatsız edici olmayacak şekilde entegre et.
+
+## Genel Notlar
+- **Aşama Öncelikleri**: Aşama 1, temel ürünü (MVP) teslim eder. Sonraki aşamalar, kullanıcı geri bildirimlerine göre önceliklendirilebilir.
+- **Test**: Her aşamada birim testleri (Jest, React Native Testing Library) ve Firebase Emulator Suite ile Security Rules testleri yapılmalı.
+- **Kullanıcı Edinimi**: Aşama 4’ten itibaren sosyal medya paylaşımı ve “Arkadaşını Davet Et” özelliğiyle organik büyüme hedeflenmeli.
+- **Maliyet Optimizasyonu**: Firebase Blaze plan öncesi Redis ve React Query ile önbellekleme kritik.

@@ -1,0 +1,13 @@
+﻿node_modules/
+.expo/
+.env
+dist/
+build/
+web-build/
+.vscode/
+*.log
+npm-debug.log*
+.yarn-integrity
+.DS_Store
+!.vscode/tasks.json
+dataconnect/

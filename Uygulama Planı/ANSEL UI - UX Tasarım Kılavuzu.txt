@@ -1,0 +1,233 @@
+
+### ANSEL UI/UX Tasarım Planı (Aşama 1 Odaklı)
+**Genel Stil Kılavuzu** (Planın özeti, tüm aşamalar için geçerli):
+- **Renk Paleti**: 
+  - Ana: #FFFFFF (beyaz, temiz zemin)
+  - Arka Plan: #F8FAFC (açık mavi-gri, huzurlu)
+  - Accent: #4A90E2 (hafif mavi, CTA’lar için)
+  - Başarı: #50C878 (yeşil, onaylar için)
+  - Uyarı: #FF9500 (turuncu, dikkat çekici)
+  - Karanlık Mod: #1A1A1A (ana), #2D3748 (arka)
+- **Tipografi**: Inter font ailesi
+  - Başlık: 24-32px, bold
+  - Alt Başlık: 18px, medium
+  - Gövde: 14-16px, regular
+  - Minimum kontrast oranı: 4.5:1 (WCAG AA uyumlu)
+- **İkonlar**: Feather Icons (minimal, ince çizgili)
+- **Animasyonlar**: Reanimated ile 300ms ease-in-out (buton scale, ekran geçişi)
+- **Boşluk**: 8px grid sistemi, 16-24px margin/padding
+- **Erişilebilirlik**: ARIA labels, VoiceOver desteği, yüksek kontrast modu
+- **Hedef Hissiyat**: Huzurlu, modern, kullanıcıyı içine çeken, Notion ve Instagram’ın sade bir karışımı
+
+### Aşama 1: Temel Yapı ve Arayüz (MVP Ekranları)
+**Amaç**: Kullanıcıyı uygulamaya çeken, basit ama estetik bir deneyim. Kullanıcı “ANSEL”e girer girmez kendini rahat ve mutlu hissetsin.
+
+#### 1. Onboarding Ekranı
+**Açıklama**: Yeni kullanıcıyı karşılayan 3 slaytlık carousel. Her slayt, ANSEL’in ruhunu yansıtan pastel gradient bir arka plan ve minimal ikonlarla süslü. Amaç: Kullanıcıyı “Kalem” kavramıyla tanıştırmak ve hemen kaydolmaya teşvik etmek.
+- **Slayt 1**: “ANSEL’e Hoş Geldin”
+  - Görsel: Ortada bir kalem ikonu (Feather Icons, yavaşça çizilen Lottie animasyonu). Arka plan: #F8FAFC’den #4A90E2’ye hafif gradient.
+  - Metin: “ANSEL ile hikayeni paylaş! Kalem’ler oluştur, topluluğa katıl.” (Inter, 24px bold, beyaz, gölgeli)
+  - Buton: “Sonraki” (mavi, 12px padding, scale animasyonu)
+- **Slayt 2**: “İlk Kalem’ini Oluştur”
+  - Görsel: Örnek bir Kalem kartı (örn. “Ankara’da Gün Batımı”, mini fotoğraf önizleme). Kart: Yuvarlak köşeli (8px), hafif gölge.
+  - Metin: “Konu aç, fotoğraf ya da video paylaş. Herkes görsün!” (16px, regular)
+  - Buton: “Sonraki”
+- **Slayt 3**: “Hemen Başla”
+  - Görsel: Topluluk hissi (birkaç kullanıcı avatarı, dairesel, üst üste hafif animasyon).
+  - Metin: “Hadi, sen de katıl!” (20px, bold)
+  - Buton: “Keşfet” (mavi, filled) + “Giriş Yap” (outline, gri)
+- **ASCII Tarifi**:
+```
+[Slayt 1]
++---------------------------+
+|       [Kalem İkonu]       |
+|                           |
+|  ANSEL’e Hoş Geldin!      |
+|  Hikayeni paylaş...       |
+|                           |
+|       [Sonraki Buton]     |
++---------------------------+
+[Arka Plan: Mavi-yeşil gradient, pastel]
+```
+**Erişilebilirlik**: VoiceOver için her metne ARIA label, butonlara focus indicator.
+
+#### 2. Giriş/Kayıt Ekranı
+**Açıklama**: Minimalist, temiz bir form. Kullanıcıyı yormadan hızlı giriş/kayıt sağlar. Huzurlu vibe için açık renkler ve yuvarlak formlar.
+- **Tasarım**:
+  - Arka plan: #F8FAFC, üstte küçük ANSEL logosu (16px, gri).
+  - Form: Beyaz kart (8px radius, hafif gölge). E-posta ve şifre input’ları (16px, Inter, outline border).
+  - Butonlar: 
+    - “Giriş Yap” (mavi, filled, scale animasyonu)
+    - “Hemen Keşfet” (anonim giriş, gri outline)
+    - Google/Apple ikonları (40x40px, minimal ikonlar)
+  - Hata: Kırmızı toast (sağ üst, 3sn kaybolur, “E-posta geçersiz”).
+- **ASCII Tarifi**:
+```
++---------------------------+
+|       [ANSEL Logo]        |
+|                           |
+|  [E-posta Input]          |
+|  [Şifre Input]            |
+|                           |
+|  [Giriş Yap Buton]        |
+|  [Hemen Keşfet]           |
+|  [Google | Apple]         |
+|                           |
++---------------------------+
+[Arka Plan: Açık mavi-gri]
+```
+**Erişilebilirlik**: Input’lara ARIA labels, hata mesajları için screen reader desteği.
+
+#### 3. Ana Tab Navigasyon (Bottom Tab Bar)
+**Açıklama**: Basit, sezgisel navigasyon. Üç sekme: Kalemler, Mesajlar, Profil. Modern ve hafif, kullanıcıyı boğmaz.
+- **Tasarım**:
+  - Bottom tab bar: Beyaz zemin, 8px padding. İkonlar: Feather Icons (ev, konuşma, kişi).
+  - Aktif sekme: #4A90E2 ile underline (2px, slide animasyonu).
+  - Karanlık mod: #2D3748 zemin, beyaz ikonlar.
+- **ASCII Tarifi**:
+```
+[Content Area]
++---------------------------+
+|  [Kalemler | Mesaj | Profil] |
++---------------------------+
+[İkonlar: Feather, active mavi underline]
+```
+**Erişilebilirlik**: Tab’lara ARIA labels, focus için haptic feedback.
+
+#### 4. Kalem Listesi Ekranı
+**Açıklama**: Feed tarzı liste, her Kalem bir kart. Minimalist kartlar, görsel odaklı, scrolling akıcı.
+- **Tasarım**:
+  - Arka plan: #F8FAFC
+  - Kart: Beyaz, 8px radius, 16px padding. Başlık (20px bold), küçük önizleme (foto/video, 100x100px, lazy load).
+  - FAB (Floating Action Button): Sağ altta “+” (mavi, dairesel, scale animasyonu).
+  - Skeleton loader: Gri placeholder (shimmer efekti).
+- **ASCII Tarifi**:
+```
++---------------------------+
+| [Kalem Kart 1]            |
+|   Başlık: Ankara Gün...   |
+|   [Önizleme Foto/Video]   |
+|                           |
+| [Kalem Kart 2]            |
+|   Başlık: En Güzel...     |
+|   [Önizleme]              |
+|                           |
+|       [+ FAB]             |
++---------------------------+
+[Arka Plan: Açık mavi-gri]
+```
+**Erişilebilirlik**: Kartlar için VoiceOver (“Ankara Gün Batımı, 5 içerik”), FAB için focus.
+
+#### 5. Kalem Oluşturma Ekranı
+**Açıklama**: Yarı ekran modal, basit ve sezgisel. Kullanıcıyı yaratıcılığa teşvik eder.
+- **Tasarım**:
+  - Modal: Beyaz, üstte yuvarlak köşeler (16px). Kapat ikonu (X, sağ üst).
+  - Başlık input: 16px, Inter, placeholder “Kalem başlığı...”.
+  - Medya picker: Galeri/kamera butonları (Feather Icons, mavi outline).
+  - “Paylaş” butonu: Mavi, filled, sağ altta (tap’te scale).
+- **ASCII Tarifi**:
+```
++---------------------------+
+| [X]                       |
+|                           |
+| [Başlık Input]            |
+|                           |
+| [Galeri | Kamera]         |
+|                           |
+|       [Paylaş Buton]      |
++---------------------------+
+[Modal: Beyaz, yuvarlak köşeler]
+```
+**Erişilebilirlik**: Input ve butonlar için ARIA labels, medya picker için screen reader.
+
+#### 6. Kalem Detay Ekranı
+**Açıklama**: Scrollable feed, içerik odaklı. Huzurlu ve görsel ağırlıklı.
+- **Tasarım**:
+  - Üstte Kalem başlığı: Gradient badge (#4A90E2’den #50C878’e, 20px bold).
+  - İçerik kartları: Beyaz, 8px radius. Foto/video (full-width, lazy load), metin (14px, gri).
+  - Scroll: Smooth, momentum bazlı (React Native ScrollView).
+- **ASCII Tarifi**:
+```
++---------------------------+
+| [Kalem Başlık Badge]      |
+|                           |
+| [İçerik Kart 1]           |
+|   [Foto/Video]            |
+|   Metin: Harika manzara!  |
+|                           |
+| [İçerik Kart 2]           |
+|   [Foto/Video]            |
+|   Metin: Gün batımı...    |
++---------------------------+
+[Arka Plan: Açık mavi-gri]
+```
+**Erişilebilirlik**: İçerik kartları için VoiceOver (“Fotoğraf, Harika manzara, 2 saat önce”).
+
+#### 7. Mesajlaşma Ekranı
+**Açıklama**: WhatsApp benzeri, sade ve akıcı chat ekranı. Huzurlu his için minimal bubble’lar.
+- **Tasarım**:
+  - Arka plan: #F8FAFC (karanlık mod: #2D3748).
+  - Bubble’lar: Sağ (mavi, 8px radius), sol (gri, 8px radius). 14px metin.
+  - Input bar: Altta, beyaz, emoji picker (Feather ikon), medya butonu.
+  - “Yazıyor…”: Gri, hafif pulse animasyonu.
+  - Okundu: Çift mavi tik (Feather ikon).
+- **ASCII Tarifi**:
+```
++---------------------------+
+| [Kullanıcı Adı]           |
+|                           |
+| [Sol Bubble: Merhaba!]    |
+| [Sağ Bubble: Nasılsın?]   |
+|                           |
+| [Yazıyor...]              |
+|                           |
+| [Input: [Emoji][Medya]]   |
++---------------------------+
+[Arka Plan: Açık mavi-gri]
+```
+**Erişilebilirlik**: Bubble’lar için VoiceOver (“Mesaj, Merhaba, 14:30”), input için focus.
+
+#### 8. Profil Ekranı
+**Açıklama**: Kullanıcıyı merkeze koyan, temiz bir profil ekranı. Huzurlu ve kişisel.
+- **Tasarım**:
+  - Üstte: Dairesel avatar (100px, border yok), ad (24px bold), katılım tarihi (14px gri).
+  - Alt: İstatistik kartları (kalem sayısı, beğeni – beyaz, 8px radius).
+  - Buton: “Profili Düzenle” (mavi outline, scale animasyonu).
+- **ASCII Tarifi**:
+```
++---------------------------+
+|       [Avatar]            |
+|       Ad Soyad            |
+|       Katılım: 2025       |
+|                           |
+| [Kalem Sayısı: 10]        |
+| [Beğeni: 50]              |
+|                           |
+| [Profili Düzenle]         |
++---------------------------+
+[Arka Plan: Açık mavi-gri]
+```
+**Erişilebilirlik**: Avatar ve istatistikler için VoiceOver, buton için focus.
+
+### Görsel Üretim için Öneriler
+AI görsel üretimi limitli olduğu için, yukarıdaki ASCII tariflerini ve açıklamaları Figma veya Midjourney’e taşıyabilirsin. Figma’da:
+1. **Grid**: 8px grid, 375x812px (iPhone) canvas.
+2. **Komponentler**: Kart (beyaz, 8px radius), buton (mavi filled/outline), input (outline, 16px).
+3. **Prototip**: Onboarding → Giriş → Kalem Listesi → Kalem Detay flow’u.
+Midjourney için prompt örneği:  
+`Minimalist social media app UI, pastel blue-gray gradient background, white cards with 8px rounded corners, modern typography (Inter), clean and serene vibe, Feather icons, mobile-first, Notion-like aesthetic, high contrast accessibility --ar 9:16 --v 5`
+
+### Ek Öneriler
+- **Figma Kullanımı**: Komponent tabanlı tasarım yap (kart, buton, input). Variants ile light/dark modları hazırla.
+- **Animasyonlar**: Reanimated ile scale (butonlar), fade (ekran geçişi), shimmer (loader) ekle.
+- **Test**: Kullanıcı testleri için Lookback.io, erişilebilirlik için Figma Accessibility Scanner.
+- **Kodlama**: Styled Components ile CSS-in-JS, NativeBase ile hızlı UI bileşenleri.
+
+### Sonuç
+Bu UI planı, ANSEL’in modern, minimalist ve huzurlu ruhunu yansıtıyor. Aşama 1 için 8 temel ekran (onboarding, giriş, tab bar, Kalem listesi, oluşturma, detay, mesajlaşma, profil) hazır. Kullanıcı, uygulamaya girer girmez kendini rahat ve motive hissedecek.
+
+Maliyet Optimizasyon Notları (UI/UX Etkileri):
+- Medya yükleme akışında istemci tarafı sıkıştırma ve maksimum çözünürlük uyarılarını UI'da görünür hale getirin.
+- Yükleme sırasında kullanıcıya 'yükleme kalitesi seç' seçeneği sunarak (düşük/orta/yüksek) veri ve depolama kullanımını azaltın.
+- Gerçek zamanlı güncellemeler yerine görsel olarak 'Yenile' butonu veya sayfalama kullanımı sunun; bu, Firestore okuma maliyetini düşürür.
+- Kullanıcıyı CDN cache'i ve lazy-loading konusunda bilgilendirici küçük ipuçları gösterin (ör. "Daha az veri kullanmak için görüntü kalitesini düşürün").
