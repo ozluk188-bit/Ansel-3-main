@@ -1,12 +1,40 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+
+    function isSignedIn() { return request.auth != null; }
+
+    // İçerikler (public okunur)
+    match /icerikler/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn()
+        && (
+          (
+            request.resource.contentType.matches('image/.*') &&
+            request.resource.size < 10 * 1024 * 1024 // < 10MB
+          ) || (
+            request.resource.contentType.matches('video/.*') &&
+            request.resource.size < 50 * 1024 * 1024 // < 50MB
+          ) || (
+            request.resource.contentType.matches('audio/.*') &&
+            request.resource.size < 20 * 1024 * 1024 // < 20MB
+          )
+        );
+    }
+
+    // Avatarlar (public okunur, sadece sahibi yazabilir)
+    match /avatars/{uid}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn()
+        && request.auth.uid == uid
+        && request.resource.contentType.matches('image/.*')
+        && request.resource.size < 5 * 1024 * 1024; // < 5MB
+    }
+
+    // Diğer tüm yollar kapalı
     match /{allPaths=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }

@@ -3,17 +3,82 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2025, 10, 20);
+    function isSignedIn() {
+      return request.auth != null;
     }
+
+    // Fallback: deny by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Kullanıcı profilleri
+    match /kullanicilar/{uid} {
+      allow read: true; // Profiller herkese açık görüntülenebilir
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && request.auth.uid == uid
+        // Kullanıcı kendi rolünü ve uid'sini değiştiremez
+        && request.resource.data.rol == resource.data.rol
+        && request.resource.data.uid == resource.data.uid;
+      allow delete: if false; // Silmeyi kapat (opsiyonel)
+    }
+
+    // Kalemler
+    match /kalemler/{kalemId} {
+      allow read: true;
+      allow create: if isSignedIn()
+        && request.resource.data.olusturanId == request.auth.uid
+        && request.resource.data.baslik is string
+        && request.resource.data.baslik.size() > 0
+        && request.resource.data.baslik.size() <= 100;
+      allow update, delete: if isSignedIn() && resource.data.olusturanId == request.auth.uid;
+    }
+
+    // İçerikler
+    match /icerikler/{icerikId} {
+      allow read: true;
+      allow create: if isSignedIn()
+        && request.resource.data.olusturanId == request.auth.uid
+        && request.resource.data.kalemId is string
+        && request.resource.data.tip in ['yazi', 'foto'];
+      allow update, delete: if isSignedIn() && resource.data.olusturanId == request.auth.uid;
+    }
+
+    // Sohbetler
+    match /chats/{chatId} {
+      function isParticipant() {
+        return isSignedIn() && (
+          (resource.data.participants != null && request.auth.uid in resource.data.participants) ||
+          (request.resource.data.participants != null && request.auth.uid in request.resource.data.participants)
+        );
+      }
+
+      allow read: if isParticipant();
+
+      // Chat oluşturma: katılımcı listesinde olmalı
+      allow create: if isSignedIn()
+        && request.resource.data.participants is list
+        && request.auth.uid in request.resource.data.participants;
+
+      // Katılımcılar, sadece unreadCount ve/veya lastOpenedAt alanlarını güncelleyebilir.
+      // participants, participantsMeta, createdAt, lastMessage alanları değiştirilemez.
+      allow update: if isParticipant()
+        && request.resource.data.participants == resource.data.participants
+        && request.resource.data.participantsMeta == resource.data.participantsMeta
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.lastMessage == resource.data.lastMessage
+        && request.resource.data.keys().hasOnly(['participants','participantsMeta','createdAt','lastMessage','unreadCount','lastOpenedAt']);
+      allow delete: if false;
+
+      // Mesajlar alt koleksiyonu
+      match /messages/{messageId} {
+        allow read: if isParticipant();
+        allow create: if isParticipant() && request.resource.data.userId == request.auth.uid;
+        allow update: if false; // Mesaj değişikliğini kapat (immutable)
+        allow delete: if false;
+      }
+    }
+
+    // İleride: oylar, yorumlar, raporlar koleksiyonları için detaylı kurallar eklenebilir
   }
 }
