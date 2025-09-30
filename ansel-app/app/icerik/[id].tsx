@@ -14,6 +14,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/src/firebaseConfig';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Fonts } from '@/constants/theme';
+import { voteOnIcerik, addYorum, createReport } from '@/src/api/interactions';
 import { Feather } from '@expo/vector-icons';
 
 // Önceki ekrandan gelen Icerik interface'i ile aynı yapıyı kullanabiliriz.
@@ -30,6 +31,8 @@ export default function IcerikDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [icerik, setIcerik] = useState<Icerik | null>(null);
   const [loading, setLoading] = useState(true);
+  const [yorumMetin, setYorumMetin] = useState('');
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -88,7 +91,34 @@ export default function IcerikDetailScreen() {
         <ActivityIndicator size="large" color={Colors.light.accent} style={styles.loading} />
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-            {renderContent()}
+          {renderContent()}
+          {/* Etkileşim Butonları */}
+          <View style={styles.actionsRow}>
+            <Pressable style={[styles.actionBtn, styles.likeBtn]} onPress={async () => { if (!id) return; setProcessing(true); try { await voteOnIcerik(id as string, 1); } finally { setProcessing(false); } }} disabled={processing}>
+              <Feather name="thumbs-up" size={18} color={Colors.light.white} />
+            </Pressable>
+            <Pressable style={[styles.actionBtn, styles.dislikeBtn]} onPress={async () => { if (!id) return; setProcessing(true); try { await voteOnIcerik(id as string, -1); } finally { setProcessing(false); } }} disabled={processing}>
+              <Feather name="thumbs-down" size={18} color={Colors.light.white} />
+            </Pressable>
+            <Pressable style={[styles.actionBtn, styles.reportBtn]} onPress={async () => { if (!id) return; setProcessing(true); try { await createReport('icerik', `icerikler/${id}`, 'Uygunsuz içerik'); } finally { setProcessing(false); } }} disabled={processing}>
+              <Feather name="flag" size={18} color={Colors.light.white} />
+            </Pressable>
+          </View>
+
+          {/* Yorum Alanı */}
+          <View style={styles.commentBox}>
+            <TextInput
+              style={styles.commentInput}
+              placeholder="Yorum yaz..."
+              placeholderTextColor={Colors.light.placeholderText}
+              value={yorumMetin}
+              onChangeText={setYorumMetin}
+              multiline
+            />
+            <Pressable style={styles.commentSend} onPress={async () => { if (!id || !yorumMetin.trim()) return; setProcessing(true); try { await addYorum(id as string, yorumMetin.trim()); setYorumMetin(''); } finally { setProcessing(false); } }} disabled={processing}>
+              <Feather name="send" size={18} color={Colors.light.white} />
+            </Pressable>
+          </View>
         </ScrollView>
       )}
     </LinearGradient>
@@ -141,5 +171,49 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.light.primaryText,
     marginTop: 16,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  actionBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  likeBtn: { backgroundColor: '#22c55e' },
+  dislikeBtn: { backgroundColor: '#ef4444' },
+  reportBtn: { backgroundColor: '#f59e0b' },
+  commentBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    backgroundColor: Colors.light.cardBackground,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+  },
+  commentInput: {
+    flex: 1,
+    minHeight: 44,
+    maxHeight: 140,
+    paddingHorizontal: 12,
+    color: Colors.light.primaryText,
+  },
+  commentSend: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.light.accent,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

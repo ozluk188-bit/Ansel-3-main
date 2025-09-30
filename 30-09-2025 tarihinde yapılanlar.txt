@@ -1,0 +1,88 @@
+ANSEL - 30/09/2025 tarihinde yapılanlar
+
+Özet
+-----
+Mesajlaşma için denormalizasyon katmanı eklendi ve sohbet listesi tek sorguda hızlı yüklenecek hale getirildi. Cloud Functions ile sohbet meta verileri (lastMessage, unreadCount, participantsMeta) otomatik güncelleniyor. Ayrıca Firestore ve Storage güvenlik kuralları planla uyumlu şekilde sıkılaştırıldı.
+
+Yapılan değişiklikler (dosya bazlı)
+-----------------------------------
+1) functions/src/updateChatOnMessage.ts (yeni)
+   - Tür: Cloud Function (Firestore trigger)
+   - Trigger: onCreate -> 'chats/{chatId}/messages/{messageId}'
+   - İşlev:
+     - Yeni mesajda `chats/{chatId}.lastMessage` alanını text/type/createdAt/sender snapshot (userName, userPhotoURL) ile günceller.
+     - Diğer katılımcılar için `unreadCount[uid] += 1` yapar.
+     - Mesaj belgesine `userName`, `userPhotoURL`, `type` snapshot’ını yazar.
+
+2) functions/src/updateChatParticipantsMeta.ts (yeni)
+   - Tür: Cloud Function (Firestore trigger)
+   - Trigger: onUpdate -> 'kullanicilar/{uid}'
+   - İşlev: Kullanıcı profili değişince, bu kullanıcıyı içeren tüm `chats` belgelerinde `participantsMeta` içindeki snapshot’ı günceller (ad, photoURL).
+
+3) functions/src/index.ts (güncellendi)
+   - Yeni fonksiyonların (updateChatOnMessage, updateChatParticipantsMeta) export edilmesi eklendi.
+
+4) app/(tabs)/mesajlar.tsx (güncellendi)
+   - N+1 kullanıcı sorgusu kaldırıldı; artık `participantsMeta` ve `lastMessage` alanları kullanılıyor.
+   - `unreadCount[currentUid]` rozeti eklendi (okunmamış mesaj sayısı gösterimi).
+
+5) app/sohbet/[id].tsx (güncellendi)
+   - Yeni sohbet oluşturulurken `participantsMeta` ve `unreadCount` ilk değerleriyle set ediliyor.
+   - Sohbet ekranı açıldığında `unreadCount[currentUid] = 0` ve `lastOpenedAt[currentUid]` yazılıyor.
+
+6) firestore.rules (güncellendi)
+   - Geçici herkese açık kural kaldırıldı; deny-by-default.
+   - `kullanicilar`: herkes okuyabilir; kullanıcı yalnızca kendi profilini güncelleyebilir (rol/uid değişemez).
+   - `kalemler`/`icerikler`: sahiplik temelli create/update/delete kısıtları.
+   - `chats`: sadece katılımcılar okuyabilir; create için katılımcı olma şartı; update’te yalnızca `unreadCount` ve `lastOpenedAt` değişebilir, `participants/participantsMeta/createdAt/lastMessage` değiştirilemez.
+   - `messages`: sadece katılımcılar; create sadece `userId == auth.uid`; update/delete kapalı.
+
+7) storage.rules (güncellendi)
+   - `icerikler/**`: public read; write için auth şartı ve içerik türü/boyut limitleri (image<10MB, video<50MB, audio<20MB).
+   - `avatars/{uid}/*`: public read; write sadece sahibi ve image<5MB.
+   - Diğer yollar kapalı.
+
+Neden bu değişiklikler yapıldı
+-----------------------------
+- Mesaj listesinde `participantsMeta` ve `lastMessage` ile tek snapshot’ta tüm gerekli verileri çekerek performans ve latency iyileştirildi (N+1 sorgu kaldırıldı).
+- `unreadCount` ile okunmamış mesaj sayıları hızlıca gösteriliyor; UX ve etkileşim artıyor.
+- Güvenlik kuralları planla uyumlu hale getirildi: sohbet ve mesajlara sadece katılımcılar erişebiliyor; medya yüklemelerinde tip/boyut kısıtları ile maliyet ve güvenlik kontrolü sağlandı.
+
+Test & doğrulama (önerilen adımlar)
+-----------------------------------
+1) Cloud Functions (Emulator)
+   - Yeni mesaj gönderildiğinde ilgili `chat.lastMessage` ve diğer kullanıcının `unreadCount` alanlarının güncellendiğini doğrulayın.
+   - Profil güncellemesinde `chats.participantsMeta` snapshot’larının değiştiğini kontrol edin.
+
+2) İstemci
+   - Mesajlar sekmesinde: liste tek sorguda isim/son mesaj/zaman/okunmamış rozeti ile gelmeli; sıralama son mesaja göre olmalı.
+   - Sohbet açılınca: `unreadCount[currentUid]` 0’a düşmeli; tekrar Mesajlar sekmesinde rozet kaybolmalı.
+
+3) Güvenlik kuralları
+   - Katılımcı olmayan kullanıcıyla `chats` ve `messages` okumalarının reddedildiğini, `lastMessage` alanına istemciden yazılamadığını doğrulayın.
+
+Deploy adımları
+---------------
+- Fonksiyonlar (opsiyonel):
+  - Derle ve emulatörde duman testi; ardından deploy.
+  - PowerShell:
+    npm install
+    npm run build
+    firebase emulators:start --only functions
+    npm run deploy
+- Kurallar:
+  - `firestore.rules` ve `storage.rules` değişikliklerini deploy et.
+
+Riskler ve dikkat edilecekler
+----------------------------
+- Mevcut eski sohbetlerde `participantsMeta`/`unreadCount` yoksa, ilk mesaj sonrası fonksiyon güncellemeleriyle tutarlılık sağlanır; istenirse küçük bir migration script’i ile doldurulabilir.
+- `unreadCount` eşzamanlı güncellemelerde yarış koşulları yaşamamak için sunucu tarafı mantık (Cloud Function) tercih edildi; istemci bu alanı doğrudan değiştirmemeli (kurallar engelliyor).
+- Kurallar sıkılaştırıldığı için istemcinin `lastMessage/participantsMeta` yazma girişimleri reddedilecektir; bu alanlar yalnızca sunucu tarafından güncellenir.
+
+Sonraki önerilen adımlar
+------------------------
+1) Oylar/Yorumlar/Raporlar koleksiyonlarını ekleyip kuralları genişletmek.
+2) “Yazıyor…” göstergesi ve (opsiyonel) mesaj-bazlı `seenBy` alanı.
+3) Analytics/Crashlytics olayları (mesaj gönderimi, sohbet açma, unread sıfırlama vb.).
+
+-- Son

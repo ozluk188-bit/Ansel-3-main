@@ -7,6 +7,11 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isModerator() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/kullanicilar/$(request.auth.uid)).data.rol in ['moderator','admin'];
+    }
+
     // Fallback: deny by default
     match /{document=**} {
       allow read, write: if false;
@@ -42,6 +47,37 @@ service cloud.firestore {
         && request.resource.data.kalemId is string
         && request.resource.data.tip in ['yazi', 'foto'];
       allow update, delete: if isSignedIn() && resource.data.olusturanId == request.auth.uid;
+
+      // Oylar: tek oy kuralı, user uid doc id olarak
+      match /oylar/{uid} {
+        allow read: if true;
+        // İlk oluşturma: belge yoksa ve kendi uid'si ile yazıyorsa
+        allow create: if isSignedIn()
+          && request.auth.uid == uid
+          && request.resource.data.oy in [1,-1]
+          && !exists(/databases/$(database)/documents/icerikler/$(icerikId)/oylar/$(uid));
+        // Oy değiştirmeye izin vermek isterseniz:
+        allow update: if isSignedIn()
+          && request.auth.uid == uid
+          && request.resource.data.oy in [1,-1];
+        allow delete: if isSignedIn() && request.auth.uid == uid;
+      }
+
+      // Yorumlar: sahiplik ve moderasyon
+      match /yorumlar/{yorumId} {
+        allow read: if true;
+        allow create: if isSignedIn()
+          && request.resource.data.kullaniciId == request.auth.uid
+          && request.resource.data.metin is string
+          && request.resource.data.metin.size() >= 1
+          && request.resource.data.metin.size() <= 2000;
+        allow update: if isSignedIn() && (
+            resource.data.kullaniciId == request.auth.uid || isModerator()
+        );
+        allow delete: if isSignedIn() && (
+            resource.data.kullaniciId == request.auth.uid || isModerator()
+        );
+      }
     }
 
     // Sohbetler
@@ -79,6 +115,18 @@ service cloud.firestore {
       }
     }
 
-    // İleride: oylar, yorumlar, raporlar koleksiyonları için detaylı kurallar eklenebilir
+    // Raporlar (top-level): herkes rapor açabilir, güncellemeyi sadece moderator yapar
+    match /raporlar/{raporId} {
+      allow read: if isModerator();
+      allow create: if isSignedIn()
+        && request.resource.data.raporlayanId == request.auth.uid
+        && request.resource.data.hedefTip in ['icerik','yorum','kullanici']
+        && request.resource.data.hedefPath is string
+        && request.resource.data.neden is string
+        && request.resource.data.neden.size() >= 3
+        && request.resource.data.neden.size() <= 500;
+      allow update: if isModerator();
+      allow delete: if false;
+    }
   }
 }
