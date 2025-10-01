@@ -15,6 +15,8 @@ import { populateCreatorFields } from './populateCreatorFields';
 import { propagateProfileChange } from './propagateProfileChange';
 import { updateChatOnMessage } from './updateChatOnMessage';
 import { updateChatParticipantsMeta } from './updateChatParticipantsMeta';
+import { aggregateVotes } from './aggregateVotes';
+import { aggregateComments } from './aggregateComments';
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -27,4 +29,4 @@ export const helloWorld = onRequest((request: any, response: any) => {
 });
 
 // Exporting the new firestore-triggered functions
-export { populateCreatorFields, propagateProfileChange, updateChatOnMessage, updateChatParticipantsMeta };
+export { populateCreatorFields, propagateProfileChange, updateChatOnMessage, updateChatParticipantsMeta, aggregateVotes, aggregateComments };
