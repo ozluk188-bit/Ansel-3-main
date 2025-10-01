@@ -12,7 +12,7 @@ import {
   Pressable,
   TextInput,
 } from 'react-native';
-import { collection, doc, getDoc, onSnapshot, orderBy, query, type DocumentData, type DocumentSnapshot, type QuerySnapshot } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, orderBy, query, getDocs, type DocumentData, type DocumentSnapshot, type QuerySnapshot } from 'firebase/firestore';
 import { db, auth } from '@/src/firebaseConfig';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Fonts } from '@/constants/theme';
@@ -38,6 +38,8 @@ interface Yorum {
   kullaniciId: string;
   metin: string;
   olusturmaTarihi?: any;
+  yazarAdi?: string;
+  yazarAvatar?: string;
 }
 
 export default function IcerikDetailScreen() {
@@ -75,9 +77,24 @@ export default function IcerikDetailScreen() {
     if (!id) return;
     const yorumCol = collection(db, 'icerikler', String(id), 'yorumlar');
     const q = query(yorumCol, orderBy('olusturmaTarihi', 'desc'));
-    const unsub = onSnapshot(q, (snap: QuerySnapshot<DocumentData>) => {
+    const unsub = onSnapshot(q, async (snap: QuerySnapshot<DocumentData>) => {
       const arr: Yorum[] = snap.docs.map((d: any) => ({ id: d.id, ...(d.data() as any) })) as any;
-      setYorumlar(arr);
+      // kullanıcı profillerini getir
+      const uniqueUserIds = Array.from(new Set(arr.map(y => y.kullaniciId).filter(Boolean)));
+      const profiles = new Map<string, { ad?: string; avatar?: string }>();
+      await Promise.all(uniqueUserIds.map(async (uid) => {
+        const p = await getDoc(doc(db, 'kullanicilar', uid));
+        if (p.exists()) {
+          const data = p.data() as any;
+          profiles.set(uid, { ad: data.ad || data.kullaniciAdi || 'Kullanıcı', avatar: data.avatar || data.fotoURL || undefined });
+        }
+      }));
+      const withProfiles = arr.map(y => ({
+        ...y,
+        yazarAdi: profiles.get(y.kullaniciId)?.ad || 'Kullanıcı',
+        yazarAvatar: profiles.get(y.kullaniciId)?.avatar,
+      }));
+      setYorumlar(withProfiles);
     });
     return () => unsub();
   }, [id]);
@@ -148,10 +165,10 @@ export default function IcerikDetailScreen() {
           {renderContent()}
           {/* Etkileşim Butonları */}
           <View style={styles.actionsRow}>
-            <Pressable style={[styles.actionBtn, myVote === 1 ? styles.likeBtnActive : styles.likeBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await voteOnIcerik(id as string, 1); setMyVote(1); } finally { setProcessing(false); } }} disabled={processing}>
+            <Pressable style={[styles.actionBtn, myVote === 1 ? styles.likeBtnActive : styles.likeBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await voteOnIcerik(id as string, 1); setMyVote((prev: 1|-1|0) => prev === 1 ? 0 : 1); } finally { setProcessing(false); } }} disabled={processing}>
               <Feather name="thumbs-up" size={18} color={Colors.light.white} />
             </Pressable>
-            <Pressable style={[styles.actionBtn, myVote === -1 ? styles.dislikeBtnActive : styles.dislikeBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await voteOnIcerik(id as string, -1); setMyVote(-1); } finally { setProcessing(false); } }} disabled={processing}>
+            <Pressable style={[styles.actionBtn, myVote === -1 ? styles.dislikeBtnActive : styles.dislikeBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await voteOnIcerik(id as string, -1); setMyVote((prev: 1|-1|0) => prev === -1 ? 0 : -1); } finally { setProcessing(false); } }} disabled={processing}>
               <Feather name="thumbs-down" size={18} color={Colors.light.white} />
             </Pressable>
             <Pressable style={[styles.actionBtn, styles.reportBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await createReport('icerik', `icerikler/${id}`, 'Uygunsuz içerik'); } finally { setProcessing(false); } }} disabled={processing}>
@@ -187,7 +204,14 @@ export default function IcerikDetailScreen() {
           {/* Yorum listesi */}
           {yorumlar.map((y) => (
             <View key={y.id} style={styles.commentItem}>
-              <Text style={styles.commentAuthor}>{y.kullaniciId.slice(0, 6)}...</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+                {y.yazarAvatar ? (
+                  <Image source={{ uri: y.yazarAvatar }} style={{ width: 24, height: 24, borderRadius: 12, marginRight: 8 }} />
+                ) : (
+                  <View style={{ width: 24, height: 24, borderRadius: 12, marginRight: 8, backgroundColor: Colors.light.divider }} />
+                )}
+                <Text style={styles.commentAuthor}>{y.yazarAdi}</Text>
+              </View>
               <Text style={styles.commentText}>{y.metin}</Text>
             </View>
           ))}

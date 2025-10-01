@@ -28,9 +28,6 @@ interface Kalem {
   baslik: string;
   olusturanId: string;
   olusturmaTarihi: any;
-  // Add placeholder for creator name, likes, comments
-  begeniSayisi?: number;
-  yorumSayisi?: number;
 }
 
 export default function KalemlerScreen() {
@@ -44,13 +41,7 @@ export default function KalemlerScreen() {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const kalemlerData: Kalem[] = [];
       querySnapshot.forEach((doc) => {
-        kalemlerData.push({
-          id: doc.id,
-          ...doc.data(),
-          // Placeholder data for now, ideally fetched from user profiles
-          begeniSayisi: Math.floor(Math.random() * 200),
-          yorumSayisi: Math.floor(Math.random() * 50),
-        } as Kalem);
+        kalemlerData.push({ id: doc.id, ...doc.data() } as Kalem);
       });
       setKalemler(kalemlerData);
     });
@@ -92,17 +83,14 @@ export default function KalemlerScreen() {
 
         <FlatList
           data={kalemler}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item: Kalem) => item.id}
           contentContainerStyle={styles.flatListContent}
           renderItem={({ item }) => (
             <Link href={`/kalem/${item.id}`} asChild>
               <Pressable>
                 <Card style={styles.kalemCard}>
                   <ThemedText type="subtitle" font="semiBold" style={styles.kalemTitle}>{item.baslik}</ThemedText>
-                  <View style={styles.kalemStats}>
-                    <ThemedText type="muted" style={{ fontSize: 12 }}>{item.begeniSayisi} beğeni</ThemedText>
-                    <ThemedText type="muted" style={{ fontSize: 12 }}>{item.yorumSayisi} yorum</ThemedText>
-                  </View>
+                  {/* Kalem listesinde oluşturucu bilgisi ve sayaçlar gösterilmez */}
                 </Card>
               </Pressable>
             </Link>
