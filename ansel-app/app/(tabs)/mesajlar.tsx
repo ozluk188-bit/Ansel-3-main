@@ -16,6 +16,8 @@ import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/Card';
 import { StyledInput } from '@/components/ui/StyledInput';
 import { GradientButton } from '@/components/ui/GradientButton';
+import { SkeletonAvatar, SkeletonLine } from '@/components/ui/Skeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface Chat {
   id: string;
@@ -135,7 +137,16 @@ export default function MesajlarScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <ActivityIndicator style={styles.loading} size="large" color={Colors.light.accent} />
+        <View style={{ paddingTop: 60 }} />
+        {[...Array(6)].map((_, idx) => (
+          <Card key={idx} style={{ flexDirection: 'row', alignItems: 'center', padding: 16, marginVertical: 8, marginHorizontal: 16 }}>
+            <SkeletonAvatar size={48} style={{ marginRight: 12 }} />
+            <View style={{ flex: 1 }}>
+              <SkeletonLine width={'60%'} height={14} />
+              <SkeletonLine width={'40%'} height={12} style={{ marginTop: 8 }} />
+            </View>
+          </Card>
+        ))}
       </LinearGradient>
     );
   }
@@ -168,12 +179,14 @@ export default function MesajlarScreen() {
           renderItem={({ item }) => currentUser ? <ChatListItem chat={item} currentUid={currentUser.uid} /> : null}
           contentContainerStyle={styles.flatListContent}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <ThemedText type="muted" style={styles.emptyText}>Henüz sohbetiniz yok.</ThemedText>
-              <Pressable onPress={() => router.push('/kullanicilar' as any)}>
-                <ThemedText type="link" style={styles.emptyLink}>Yeni bir sohbet başlatın!</ThemedText>
-              </Pressable>
-            </View>
+            <EmptyState
+              title="Henüz sohbetiniz yok."
+              subtitle="Yeni bir sohbet başlatmak için buraya dokunun."
+              actionTitle="Yeni sohbet başlat"
+              onPress={() => router.push('/kullanicilar' as any)}
+              icon={null}
+              style={styles.emptyContainer}
+            />
           }
         />
 

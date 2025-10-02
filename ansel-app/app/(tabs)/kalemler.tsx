@@ -22,6 +22,8 @@ import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/Card';
 import { GradientButton } from '@/components/ui/GradientButton';
 import { StyledInput } from '@/components/ui/StyledInput';
+import { SkeletonCard, SkeletonLine } from '@/components/ui/Skeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface Kalem {
   id: string;
@@ -35,6 +37,7 @@ export default function KalemlerScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [yeniKalemBaslik, setYeniKalemBaslik] = useState('');
   const [loadingAddKalem, setLoadingAddKalem] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const q = query(collection(db, 'kalemler'), orderBy('olusturmaTarihi', 'desc'));
@@ -44,6 +47,7 @@ export default function KalemlerScreen() {
         kalemlerData.push({ id: doc.id, ...doc.data() } as Kalem);
       });
       setKalemler(kalemlerData);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -81,6 +85,16 @@ export default function KalemlerScreen() {
           <ThemedText type="title" font="bold" style={styles.headerTitle}>Kalemler</ThemedText>
         </View>
 
+        {loading ? (
+          <View style={{ paddingVertical: 8 }}>
+            {[...Array(6)].map((_, i) => (
+              <Card key={i} style={{ marginVertical: 8, marginHorizontal: 16, padding: 15 }}>
+                <SkeletonLine width={'70%'} height={18} />
+                <SkeletonLine width={'40%'} height={14} style={{ marginTop: 10 }} />
+              </Card>
+            ))}
+          </View>
+        ) : (
         <FlatList
           data={kalemler}
           keyExtractor={(item: Kalem) => item.id}
@@ -96,11 +110,10 @@ export default function KalemlerScreen() {
             </Link>
           )}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <ThemedText type="muted" style={styles.emptyText}>Henüz kalem yok. İlkini sen ekle!</ThemedText>
-            </View>
+            <EmptyState title="Henüz kalem yok." subtitle="İlkini sen ekleyebilirsin." style={styles.emptyContainer} />
           }
         />
+        )}
 
         {/* Yeni Kalem Ekleme Modalı */}
         <Modal

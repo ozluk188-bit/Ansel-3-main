@@ -29,6 +29,11 @@ import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Fonts } from '@/constants/theme';
+import { useToast } from '@/components/ui/Toast';
+import { hapticError, hapticLight, hapticSuccess } from '@/src/utils/haptics';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { SkeletonCard, SkeletonLine, SkeletonAvatar } from '@/components/ui/Skeleton';
+import { t } from '@/src/i18n';
 
 interface Icerik {
   id: string;
@@ -49,6 +54,7 @@ interface Kalem {
 export default function KalemDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const toast = useToast();
   const [kalem, setKalem] = useState<Kalem | null>(null);
   const [icerikler, setIcerikler] = useState<Icerik[]>([]);
   const [yeniIcerikMetin, setYeniIcerikMetin] = useState('');
@@ -137,9 +143,12 @@ export default function KalemDetailScreen() {
         tip: 'foto',
         medyaURL: downloadURL,
       });
+      hapticSuccess();
+      toast.show('Fotoğraf yüklendi', { type: 'success' });
     } catch (e) {
       console.error('Image upload error:', e);
       Alert.alert('Hata', 'Fotoğraf yüklenirken bir sorun oluştu.');
+      hapticError();
     } finally {
       setUploading(false);
     }
@@ -156,9 +165,12 @@ export default function KalemDetailScreen() {
         tip: 'yazi',
       });
       setYeniIcerikMetin('');
+      hapticSuccess();
+      toast.show('Gönderildi', { type: 'success' });
     } catch (e) {
       console.error('Add text error:', e);
       Alert.alert('Hata', 'Mesaj gönderilirken bir sorun oluştu.');
+      hapticError();
     }
   };
   
@@ -195,7 +207,17 @@ export default function KalemDetailScreen() {
       <Stack.Screen options={{ title: kalem?.baslik || 'Yükleniyor...' }} />
       
       {loading ? (
-        <ActivityIndicator size="large" color={Colors.light.accent} style={styles.loading} />
+        <View style={{ padding: 16 }}>
+          {[...Array(4)].map((_, idx) => (
+            <View key={idx} style={{ marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }}>
+                <SkeletonAvatar size={40} style={{ marginRight: 12 }} />
+                <SkeletonLine width={'40%'} height={14} />
+              </View>
+              <SkeletonCard height={180} />
+            </View>
+          ))}
+        </View>
       ) : (
         <FlatList
           data={icerikler}
@@ -203,11 +225,7 @@ export default function KalemDetailScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContentContainer}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Feather name="moon" size={48} color={Colors.light.mutedText} />
-              <Text style={styles.emptyText}>Henüz hiç içerik yok.</Text>
-              <Text style={styles.emptySubText}>İlk içeriği sen ekle!</Text>
-            </View>
+            <EmptyState title="Henüz hiç içerik yok." subtitle="İlk içeriği sen ekle!" style={styles.emptyContainer} />
           }
         />
       )}
