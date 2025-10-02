@@ -4,6 +4,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/src/firebaseConfig';
 import { ActivityIndicator, View } from 'react-native';
+import { ToastProvider } from '@/components/ui/Toast';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Inter_700Bold } from '@expo-google-fonts/inter'; // Import Inter_700Bold
 
@@ -51,12 +52,14 @@ export default function RootLayout() {
   // The initial layout is now always a Stack, and the useEffect handles routing.
   // The loading state is implicitly handled by the router not moving until auth/fonts are loaded.
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="login" options={{ headerShown: false }} />
-      <Stack.Screen name="signup" options={{ headerShown: false }} /> {/* Add signup screen */}
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-    </Stack>
+    <ToastProvider>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="signup" options={{ headerShown: false }} /> {/* Add signup screen */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+      </Stack>
+    </ToastProvider>
   );
 }

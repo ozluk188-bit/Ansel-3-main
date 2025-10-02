@@ -18,6 +18,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Fonts } from '@/constants/theme';
 import { voteOnIcerik, addYorum, createReport } from '@/src/api/interactions';
 import { Feather } from '@expo/vector-icons';
+import { useToast } from '@/components/ui/Toast';
+import { hapticLight, hapticSuccess } from '@/src/utils/haptics';
+import { t } from '@/src/i18n';
 
 // Önceki ekrandan gelen Icerik interface'i ile aynı yapıyı kullanabiliriz.
 interface Icerik {
@@ -44,6 +47,7 @@ interface Yorum {
 
 export default function IcerikDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const toast = useToast();
   const [icerik, setIcerik] = useState<Icerik | null>(null);
   const [loading, setLoading] = useState(true);
   const [yorumMetin, setYorumMetin] = useState('');
@@ -165,13 +169,13 @@ export default function IcerikDetailScreen() {
           {renderContent()}
           {/* Etkileşim Butonları */}
           <View style={styles.actionsRow}>
-            <Pressable style={[styles.actionBtn, myVote === 1 ? styles.likeBtnActive : styles.likeBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await voteOnIcerik(id as string, 1); setMyVote((prev: 1|-1|0) => prev === 1 ? 0 : 1); } finally { setProcessing(false); } }} disabled={processing}>
+            <Pressable style={[styles.actionBtn, myVote === 1 ? styles.likeBtnActive : styles.likeBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await voteOnIcerik(id as string, 1); const next = myVote === 1 ? 0 : 1; setMyVote(next as any); hapticLight(); toast.show(next === 0 ? t('vote_removed') : t('like_success'), { type: 'success' }); } finally { setProcessing(false); } }} disabled={processing}>
               <Feather name="thumbs-up" size={18} color={Colors.light.white} />
             </Pressable>
-            <Pressable style={[styles.actionBtn, myVote === -1 ? styles.dislikeBtnActive : styles.dislikeBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await voteOnIcerik(id as string, -1); setMyVote((prev: 1|-1|0) => prev === -1 ? 0 : -1); } finally { setProcessing(false); } }} disabled={processing}>
+            <Pressable style={[styles.actionBtn, myVote === -1 ? styles.dislikeBtnActive : styles.dislikeBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await voteOnIcerik(id as string, -1); const next = myVote === -1 ? 0 : -1; setMyVote(next as any); hapticLight(); toast.show(next === 0 ? t('vote_removed') : t('dislike_success'), { type: 'info' }); } finally { setProcessing(false); } }} disabled={processing}>
               <Feather name="thumbs-down" size={18} color={Colors.light.white} />
             </Pressable>
-            <Pressable style={[styles.actionBtn, styles.reportBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await createReport('icerik', `icerikler/${id}`, 'Uygunsuz içerik'); } finally { setProcessing(false); } }} disabled={processing}>
+            <Pressable style={[styles.actionBtn, styles.reportBtn]} onPress={async () => { if (!id) return; if (!requireAuth()) return; setProcessing(true); try { await createReport('icerik', `icerikler/${id}`, 'Uygunsuz içerik'); hapticSuccess(); toast.show(t('report_sent'), { type: 'info' }); } finally { setProcessing(false); } }} disabled={processing}>
               <Feather name="flag" size={18} color={Colors.light.white} />
             </Pressable>
           </View>
@@ -196,7 +200,7 @@ export default function IcerikDetailScreen() {
               onChangeText={setYorumMetin}
               multiline
             />
-            <Pressable style={styles.commentSend} onPress={async () => { if (!id || !yorumMetin.trim()) return; if (!auth.currentUser) { Alert.alert('Giriş gerekli','Devam etmek için giriş yap.'); return; } setProcessing(true); try { await addYorum(id as string, yorumMetin.trim()); setYorumMetin(''); } finally { setProcessing(false); } }} disabled={processing}>
+            <Pressable style={styles.commentSend} onPress={async () => { if (!id || !yorumMetin.trim()) return; if (!auth.currentUser) { Alert.alert('Giriş gerekli','Devam etmek için giriş yap.'); return; } setProcessing(true); try { await addYorum(id as string, yorumMetin.trim()); setYorumMetin(''); hapticSuccess(); toast.show(t('comment_sent'), { type: 'success' }); } finally { setProcessing(false); } }} disabled={processing}>
               <Feather name="send" size={18} color={Colors.light.white} />
             </Pressable>
           </View>
