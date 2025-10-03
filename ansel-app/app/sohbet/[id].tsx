@@ -30,6 +30,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { db, auth } from '@/src/firebaseConfig';
 import { Colors, Fonts } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { SkeletonLine } from '@/components/ui/Skeleton';
+import { t } from '@/src/i18n';
 
 interface Message {
   id: string;
@@ -53,6 +57,9 @@ export default function SohbetScreen() {
   const [loading, setLoading] = useState(true);
   const currentUser = auth.currentUser;
   const insets = useSafeAreaInsets();
+  const inputRef = useRef<TextInput>(null);
+  const scheme = useColorScheme() ?? 'light';
+  const C = Colors[scheme as 'light' | 'dark'];
 
   useEffect(() => {
     const fetchOtherUser = async () => {
@@ -201,7 +208,7 @@ export default function SohbetScreen() {
 
   return (
     <LinearGradient
-      colors={[Colors.light.backgroundStart, Colors.light.backgroundEnd]}
+      colors={[C.backgroundStart, C.backgroundEnd]}
       style={styles.container}>
       <Stack.Screen options={{ title: otherUser?.ad || 'Sohbet' }} />
       <KeyboardAvoidingView
@@ -210,34 +217,53 @@ export default function SohbetScreen() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
 
         {loading ? (
-            <ActivityIndicator style={styles.loading} size="large" color={Colors.light.accent} />
+          <View style={styles.loadingContainer}>
+            <SkeletonLine width="70%" height={18} style={{ alignSelf: 'flex-start', marginVertical: 6 }} />
+            <SkeletonLine width="55%" height={18} style={{ alignSelf: 'flex-end', marginVertical: 6 }} />
+            <SkeletonLine width="62%" height={18} style={{ alignSelf: 'flex-start', marginVertical: 6 }} />
+            <SkeletonLine width="44%" height={18} style={{ alignSelf: 'flex-end', marginVertical: 6 }} />
+            <SkeletonLine width="68%" height={18} style={{ alignSelf: 'flex-start', marginVertical: 6 }} />
+          </View>
         ) : (
-            <FlatList
-                data={messages}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                inverted
-                contentContainerStyle={styles.listContainer}
-                ListEmptyComponent={
-                    <View style={styles.emptyContainer}>
-                        <Feather name="moon" size={48} color={Colors.light.mutedText} />
-                        <Text style={styles.emptyText}>Sohbeti başlat!</Text>
-                    </View>
-                }
-            />
+          <FlatList
+            data={messages}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            inverted
+            contentContainerStyle={styles.listContainer}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <EmptyState
+                  title={t('start_chat')}
+                  subtitle={t('type_first_message')}
+                  actionTitle={t('write_message')}
+                  onPress={() => inputRef.current?.focus()}
+                />
+              </View>
+            }
+          />
         )}
 
         <View style={[styles.inputContainer, { paddingBottom: insets.bottom + 8 }]}>
           <TextInput
+            ref={inputRef}
             style={styles.input}
-            placeholder="Mesaj yaz..."
-            placeholderTextColor={Colors.light.placeholderText}
+            placeholder={t('write_message')}
+            placeholderTextColor={C.placeholderText}
             value={newMessage}
             onChangeText={setNewMessage}
             multiline
+            accessibilityLabel="Mesaj yaz"
+            accessibilityHint="Mesajınızı bu alana yazın"
           />
-          <Pressable style={styles.sendButton} onPress={handleSend}>
-            <Feather name="send" size={22} color={Colors.light.white} />
+          <Pressable
+            style={styles.sendButton}
+            onPress={handleSend}
+            accessibilityRole="button"
+            accessibilityLabel={t('send')}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Feather name="send" size={22} color={C.white} />
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -253,6 +279,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   listContainer: {
     paddingHorizontal: 10,
@@ -339,9 +370,9 @@ const styles = StyleSheet.create({
     color: Colors.light.primaryText,
   },
   sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: Colors.light.accent,
     justifyContent: 'center',
     alignItems: 'center',

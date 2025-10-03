@@ -24,6 +24,7 @@ import { GradientButton } from '@/components/ui/GradientButton';
 import { StyledInput } from '@/components/ui/StyledInput';
 import { SkeletonCard, SkeletonLine } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 interface Kalem {
   id: string;
@@ -38,6 +39,8 @@ export default function KalemlerScreen() {
   const [yeniKalemBaslik, setYeniKalemBaslik] = useState('');
   const [loadingAddKalem, setLoadingAddKalem] = useState(false);
   const [loading, setLoading] = useState(true);
+  const scheme = useColorScheme() ?? 'light';
+  const C = Colors[scheme as 'light' | 'dark'];
 
   useEffect(() => {
     const q = query(collection(db, 'kalemler'), orderBy('olusturmaTarihi', 'desc'));
@@ -74,7 +77,7 @@ export default function KalemlerScreen() {
 
   return (
     <LinearGradient
-      colors={[Colors.light.backgroundStart, Colors.light.backgroundMid, Colors.light.backgroundEnd]}
+      colors={[C.backgroundStart, C.backgroundMid, C.backgroundEnd]}
       style={styles.fullScreenGradient}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
@@ -82,7 +85,7 @@ export default function KalemlerScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <ThemedText type="title" font="bold" style={styles.headerTitle}>Kalemler</ThemedText>
+          <ThemedText type="title" font="bold" style={[styles.headerTitle, { color: C.primaryText }]}>Kalemler</ThemedText>
         </View>
 
         {loading ? (
@@ -101,8 +104,12 @@ export default function KalemlerScreen() {
           contentContainerStyle={styles.flatListContent}
           renderItem={({ item }) => (
             <Link href={`/kalem/${item.id}`} asChild>
-              <Pressable>
-                <Card style={styles.kalemCard}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Kaleme git: ${item.baslik}`}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              >
+                <Card style={[styles.kalemCard, { backgroundColor: C.cardBackground }] }>
                   <ThemedText type="subtitle" font="semiBold" style={styles.kalemTitle}>{item.baslik}</ThemedText>
                   {/* Kalem listesinde oluşturucu bilgisi ve sayaçlar gösterilmez */}
                 </Card>
@@ -122,8 +129,8 @@ export default function KalemlerScreen() {
           visible={modalVisible}
           onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
-            <View style={styles.modalView}>
-              <ThemedText type="title" font="bold" style={styles.modalTitle}>Yeni Kalem Oluştur</ThemedText>
+            <View style={[styles.modalView, { backgroundColor: C.cardBackground }]}>
+              <ThemedText type="title" font="bold" style={[styles.modalTitle, { color: C.primaryText }]}>Yeni Kalem Oluştur</ThemedText>
               <StyledInput
                 placeholder="Kalem başlığı..."
                 value={yeniKalemBaslik}
@@ -135,8 +142,9 @@ export default function KalemlerScreen() {
                 onPress={handleAddKalem}
                 loading={loadingAddKalem}
                 style={{ marginBottom: 10 }}
+                accessibilityLabel="Yeni kalemi oluştur"
               />
-              <Pressable onPress={() => setModalVisible(false)}>
+              <Pressable onPress={() => setModalVisible(false)} accessibilityRole="button" accessibilityLabel="İptal et" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
                 <ThemedText type="link">İptal</ThemedText>
               </Pressable>
             </View>
@@ -148,9 +156,10 @@ export default function KalemlerScreen() {
           title="+" // Using + as title for FAB
           onPress={() => setModalVisible(true)}
           style={styles.fab}
-          startColor={Colors.light.accentStart}
-          endColor={Colors.light.accentEnd}
-          textColor={Colors.light.white}
+          startColor={C.accentStart}
+          endColor={C.accentEnd}
+          textColor={C.white}
+          accessibilityLabel="Yeni kalem oluştur"
         />
       </View>
     </LinearGradient>

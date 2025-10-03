@@ -48,7 +48,7 @@ export function ThemedText({
         type === 'default' ? styles.default : undefined,
         type === 'title' ? styles.title : undefined,
         type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
+        type === 'link' ? { ...styles.link, color } : undefined,
         style,
       ]}
       {...rest}
@@ -73,6 +73,5 @@ const styles = StyleSheet.create({
   link: {
     fontSize: 16,
     lineHeight: 30,
-    color: Colors.light.accent, // Use theme color
   },
 });

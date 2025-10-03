@@ -1,14 +1,17 @@
 import React from 'react';
 import { View, StyleSheet, ViewProps } from 'react-native';
 import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 interface CardProps extends ViewProps {
   // You can add custom props here if needed
 }
 
 export function Card({ style, children, ...rest }: CardProps) {
+  const scheme = useColorScheme() ?? 'light';
+  const C = Colors[scheme as 'light' | 'dark'];
   return (
-    <View style={[styles.card, style]} {...rest}>
+    <View style={[styles.card, { backgroundColor: C.cardBackground }, style]} {...rest}>
       {children}
     </View>
   );
@@ -16,7 +19,6 @@ export function Card({ style, children, ...rest }: CardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.light.cardBackground,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },

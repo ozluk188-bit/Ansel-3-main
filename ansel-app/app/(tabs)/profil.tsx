@@ -9,11 +9,17 @@ import { Colors, Fonts } from '@/constants/theme'; // Import Colors
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/Card';
 import { GradientButton } from '@/components/ui/GradientButton';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { SkeletonCard } from '@/components/ui/Skeleton';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { t } from '@/src/i18n';
 
 export default function ProfilScreen() {
   const user = auth.currentUser;
   const router = useRouter();
   const [loadingLogout, setLoadingLogout] = useState(false);
+  const scheme = useColorScheme() ?? 'light';
+  const C = Colors[scheme as 'light' | 'dark'];
 
   const handleLogout = () => {
     setLoadingLogout(true);
@@ -38,15 +44,25 @@ export default function ProfilScreen() {
 
   return (
     <LinearGradient
-      colors={[Colors.light.backgroundStart, Colors.light.backgroundMid, Colors.light.backgroundEnd]}
+      colors={[C.backgroundStart, C.backgroundMid, C.backgroundEnd]}
       style={styles.fullScreenGradient}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
       <View style={styles.container}>
+        {!user ? (
+          <EmptyState
+            title={t('requires_login_title')}
+            subtitle={t('requires_login_sub')}
+            actionTitle={t('login')}
+            onPress={() => router.push('/login')}
+            style={{ marginTop: 80 }}
+          />
+        ) : (
+          <>
         {/* Header */}
         <View style={styles.header}>
-          <ThemedText type="title" font="bold" style={styles.headerTitle}>Profil</ThemedText>
+          <ThemedText type="title" font="bold" style={styles.headerTitle}>{t('profile_title')}</ThemedText>
         </View>
 
         {/* Avatar */}
@@ -85,32 +101,42 @@ export default function ProfilScreen() {
           />
           <Pressable
             onPress={() => console.log('Send Message')}
+            accessibilityRole="button"
+            accessibilityLabel="Kullanıcıya mesaj gönder"
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             style={[styles.actionButton, styles.messageButtonOutline]}
           >
             <ThemedText type="default" font="semiBold" style={styles.messageButtonText}>Mesaj</ThemedText>
           </Pressable>
         </View>
 
-        {/* Content Cards (Placeholder) */}
+        {/* Content Cards (Skeleton placeholders for now) */}
         <View style={styles.contentCardsContainer}>
           <Card style={styles.contentCardPlaceholder}>
-            <View style={styles.contentCardImagePlaceholder} />
-            <View style={styles.contentCardTextPlaceholder} />
+            <SkeletonCard height={74} style={{ flex: 1 }} />
           </Card>
           <Card style={styles.contentCardPlaceholder}>
-            <View style={styles.contentCardImagePlaceholder} />
-            <View style={styles.contentCardTextPlaceholder} />
+            <SkeletonCard height={74} style={{ flex: 1 }} />
           </Card>
         </View>
 
         {/* Logout Button */}
-        <Pressable onPress={handleLogout} disabled={loadingLogout} style={styles.logoutButton}>
+        <Pressable
+          onPress={handleLogout}
+          disabled={loadingLogout}
+          accessibilityRole="button"
+          accessibilityLabel="Hesaptan çıkış yap"
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          style={styles.logoutButton}
+        >
           {loadingLogout ? (
             <ActivityIndicator color={Colors.light.primaryText} />
           ) : (
             <ThemedText type="link" style={styles.logoutButtonText}>Çıkış Yap</ThemedText>
           )}
         </Pressable>
+          </>
+        )}
       </View>
     </LinearGradient>
   );

@@ -7,12 +7,12 @@ import {
   FlatList,
   TextInput,
   Pressable,
-  Image,
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import {
   collection,
   doc,
@@ -29,6 +29,7 @@ import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Fonts } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useToast } from '@/components/ui/Toast';
 import { hapticError, hapticLight, hapticSuccess } from '@/src/utils/haptics';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -60,6 +61,8 @@ export default function KalemDetailScreen() {
   const [yeniIcerikMetin, setYeniIcerikMetin] = useState('');
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const scheme = useColorScheme() ?? 'light';
+  const C = Colors[scheme as 'light' | 'dark'];
 
   useEffect(() => {
     if (!id) return;
@@ -180,20 +183,43 @@ export default function KalemDetailScreen() {
   };
 
   const renderIcerik = ({ item }: { item: Icerik }) => (
-    <Pressable onPress={() => navigateToDetail(item)} style={styles.card}>
-      <Pressable onPress={() => router.push((`/profil/${item.olusturanId}` as any))} style={styles.cardHeader}>
+    <Pressable
+      onPress={() => navigateToDetail(item)}
+      style={[styles.card, { backgroundColor: C.cardBackground }]}
+      accessibilityRole="button"
+      accessibilityLabel="İçerik detayını aç"
+      hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+    >
+      <Pressable
+        onPress={() => router.push((`/profil/${item.olusturanId}` as any))}
+        style={styles.cardHeader}
+        accessibilityRole="button"
+        accessibilityLabel={`Profil: ${item.olusturanAdi || 'Kullanıcı'}`}
+        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+      >
         {item.olusturanAvatar ? (
-          <Image source={{ uri: item.olusturanAvatar }} style={styles.avatar} />
+          <ExpoImage
+            source={{ uri: item.olusturanAvatar }}
+            style={styles.avatar}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+          />
         ) : (
-          <View style={styles.avatar} />
+          <View style={[styles.avatar, { backgroundColor: C.divider }]} />
         )}
-        <Text style={styles.username}>{item.olusturanAdi}</Text>
+        <Text style={[styles.username, { color: C.primaryText }]}>{item.olusturanAdi}</Text>
       </Pressable>
       {item.tip === 'foto' && item.medyaURL ? (
-        <Image source={{ uri: item.medyaURL }} style={styles.cardImage} />
+        <ExpoImage
+          source={{ uri: item.medyaURL }}
+          style={styles.cardImage}
+          contentFit="cover"
+          transition={300}
+          cachePolicy="memory-disk"
+        />
       ) : (
         <View style={styles.cardTextContainer}>
-          <Text style={styles.cardText} numberOfLines={5}>{item.metin}</Text>
+          <Text style={[styles.cardText, { color: C.primaryText }]} numberOfLines={5}>{item.metin}</Text>
         </View>
       )}
     </Pressable>
@@ -201,10 +227,10 @@ export default function KalemDetailScreen() {
 
   return (
     <LinearGradient
-      colors={[Colors.light.backgroundStart, Colors.light.backgroundEnd]}
+      colors={[C.backgroundStart, C.backgroundEnd]}
       style={styles.container}
     >
-      <Stack.Screen options={{ title: kalem?.baslik || 'Yükleniyor...' }} />
+  <Stack.Screen options={{ title: kalem?.baslik || 'Yükleniyor...' }} />
       
       {loading ? (
         <View style={{ padding: 16 }}>
@@ -234,20 +260,20 @@ export default function KalemDetailScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
-        <View style={styles.inputContainer}>
-          <Pressable style={styles.iconButton} onPress={pickImage} disabled={uploading}>
-            <Feather name="paperclip" size={22} color={Colors.light.secondaryText} />
+        <View style={[styles.inputContainer, { backgroundColor: C.cardBackground, borderTopColor: C.divider }]}>
+          <Pressable style={styles.iconButton} onPress={pickImage} disabled={uploading} accessibilityLabel={t('attach_photo')} accessibilityRole="button" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+            <Feather name="paperclip" size={22} color={C.secondaryText} />
           </Pressable>
           <TextInput
-            style={styles.input}
-            placeholder="Bir şeyler yaz..."
-            placeholderTextColor={Colors.light.placeholderText}
+            style={[styles.input, { backgroundColor: C.inputBackground, color: C.primaryText }]}
+            placeholder={t('write_something_placeholder')}
+            placeholderTextColor={C.placeholderText}
             value={yeniIcerikMetin}
             onChangeText={setYeniIcerikMetin}
             multiline
           />
-          <Pressable style={styles.sendButton} onPress={handleAddMetin} disabled={uploading}>
-            {uploading ? <ActivityIndicator size="small" color={Colors.light.white} /> : <Feather name="send" size={22} color={Colors.light.white} />}
+          <Pressable style={[styles.sendButton, { backgroundColor: C.accent }]} onPress={handleAddMetin} disabled={uploading} accessibilityRole="button" accessibilityLabel={t('send')} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+            {uploading ? <ActivityIndicator size="small" color={C.white} /> : <Feather name="send" size={22} color={C.white} />}
           </Pressable>
         </View>
       </KeyboardAvoidingView>

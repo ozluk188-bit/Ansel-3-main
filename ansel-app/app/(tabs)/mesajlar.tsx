@@ -18,6 +18,9 @@ import { StyledInput } from '@/components/ui/StyledInput';
 import { GradientButton } from '@/components/ui/GradientButton';
 import { SkeletonAvatar, SkeletonLine } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { t } from '@/src/i18n';
+import { Image as ExpoImage } from 'expo-image';
 
 interface Chat {
   id: string;
@@ -51,7 +54,7 @@ const formatTimestamp = (timestamp: any) => {
   }
 };
 
-function ChatListItem({ chat, currentUid }: { chat: Chat; currentUid: string }) {
+function ChatListItem({ chat, currentUid, C }: { chat: Chat; currentUid: string; C: typeof Colors.light }) {
   const other = chat.participantsMeta?.find(p => p.uid !== currentUid);
   if (!other) return null;
 
@@ -60,11 +63,24 @@ function ChatListItem({ chat, currentUid }: { chat: Chat; currentUid: string }) 
   };
 
   return (
-    <Pressable onPress={handlePress}>
+    <Pressable
+      onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={`Sohbet aç: ${other.ad || 'Kullanıcı'}`}
+      hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+    >
       <Card style={styles.chatItemCard}>
-        <View style={styles.avatarPlaceholder}>
-          {/* Avatar initial or image */}
-        </View>
+        {other.photoURL ? (
+          <ExpoImage
+            source={{ uri: other.photoURL }}
+            style={{ width: 48, height: 48, borderRadius: 24, marginRight: 12 }}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={200}
+          />
+        ) : (
+          <View style={[styles.avatarPlaceholder, { backgroundColor: C.lightBlue }]} />
+        )}
         <View style={styles.chatInfo}>
           <ThemedText type="default" font="semiBold" style={styles.userName}>{other.ad || 'Kullanıcı'}</ThemedText>
           {chat.lastMessage && (
@@ -79,8 +95,8 @@ function ChatListItem({ chat, currentUid }: { chat: Chat; currentUid: string }) 
           </ThemedText>
         )}
         {!!chat.unreadCount && chat.unreadCount[currentUid] > 0 && (
-          <View style={styles.unreadBadge}>
-            <ThemedText style={styles.unreadText}>{chat.unreadCount[currentUid]}</ThemedText>
+          <View style={[styles.unreadBadge, { backgroundColor: C.accent }]}>
+            <ThemedText style={[styles.unreadText, { color: C.white }]}>{chat.unreadCount[currentUid]}</ThemedText>
           </View>
         )}
       </Card>
@@ -93,6 +109,8 @@ export default function MesajlarScreen() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(''); // For search bar
   const currentUser = auth.currentUser;
+  const scheme = useColorScheme() ?? 'light';
+  const C = Colors[scheme as 'light' | 'dark'];
 
   useEffect(() => {
     if (!currentUser) {
@@ -132,7 +150,7 @@ export default function MesajlarScreen() {
   if (loading) {
     return (
       <LinearGradient
-        colors={[Colors.light.backgroundStart, Colors.light.backgroundMid, Colors.light.backgroundEnd]}
+        colors={[C.backgroundStart, C.backgroundMid, C.backgroundEnd]}
         style={styles.fullScreenGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -153,7 +171,7 @@ export default function MesajlarScreen() {
 
   return (
     <LinearGradient
-      colors={[Colors.light.backgroundStart, Colors.light.backgroundMid, Colors.light.backgroundEnd]}
+      colors={[C.backgroundStart, C.backgroundMid, C.backgroundEnd]}
       style={styles.fullScreenGradient}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
@@ -161,13 +179,13 @@ export default function MesajlarScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <ThemedText type="title" font="bold" style={styles.headerTitle}>Mesajlar</ThemedText>
+          <ThemedText type="title" font="bold" style={[styles.headerTitle, { color: C.primaryText }]}>{t('messages_title')}</ThemedText>
         </View>
 
         {/* Search Bar */}
         <View style={styles.searchBarContainer}>
           <StyledInput
-            placeholder="Ara..."
+            placeholder={t('search_placeholder')}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -176,13 +194,13 @@ export default function MesajlarScreen() {
         <FlatList
           data={filteredChats}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => currentUser ? <ChatListItem chat={item} currentUid={currentUser.uid} /> : null}
+          renderItem={({ item }) => currentUser ? <ChatListItem chat={item} currentUid={currentUser.uid} C={C} /> : null}
           contentContainerStyle={styles.flatListContent}
           ListEmptyComponent={
             <EmptyState
-              title="Henüz sohbetiniz yok."
-              subtitle="Yeni bir sohbet başlatmak için buraya dokunun."
-              actionTitle="Yeni sohbet başlat"
+              title={t('empty_chats_title')}
+              subtitle={t('empty_chats_sub')}
+              actionTitle={t('start_new_chat')}
               onPress={() => router.push('/kullanicilar' as any)}
               icon={null}
               style={styles.emptyContainer}
@@ -195,9 +213,11 @@ export default function MesajlarScreen() {
           title="+"
           onPress={() => router.push('/kullanicilar' as any)} // Navigate to users list to start new chat
           style={styles.fab}
-          startColor={Colors.light.accentStart}
-          endColor={Colors.light.accentEnd}
-          textColor={Colors.light.white}
+          startColor={C.accentStart}
+          endColor={C.accentEnd}
+          textColor={C.white}
+          accessibilityLabel="Yeni sohbet başlat"
+          accessibilityHint="Kullanıcı listesine gider"
         />
       </View>
     </LinearGradient>

@@ -4,6 +4,9 @@ import { Feather } from '@expo/vector-icons';
 import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { auth, db } from '@/src/firebaseConfig';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/theme';
+import { t } from '@/src/i18n';
 
 export default function TabLayout() {
   const [unreadTotal, setUnreadTotal] = useState<number>(0);
@@ -24,12 +27,15 @@ export default function TabLayout() {
     return () => unsub();
   }, [auth.currentUser?.uid]);
 
+  const scheme = useColorScheme() ?? 'light';
+  const C = Colors[scheme as 'light' | 'dark'];
+
   const MessageIcon = ({ color, size }: { color: string; size: number }) => (
     <View>
       <Feather name="message-circle" size={size} color={color} />
       {unreadTotal > 0 && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{unreadTotal > 99 ? '99+' : unreadTotal}</Text>
+        <View style={[styles.badge, { backgroundColor: C.error }]}>
+          <Text style={[styles.badgeText, { color: C.white }]}>{unreadTotal > 99 ? '99+' : unreadTotal}</Text>
         </View>
       )}
     </View>
@@ -39,24 +45,25 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#4A90E2', // Planımızdaki Accent rengi
+        tabBarActiveTintColor: C.accent,
+        tabBarInactiveTintColor: C.tabIconDefault,
       }}>
       <Tabs.Screen
         name="kalemler"
         options={{
-          title: 'Kalemler',
+          title: t('kalemler_title'),
           tabBarIcon: ({ color, size }) => <Feather name="home" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="mesajlar"
         options={{
-          title: 'Mesajlar',
+          title: t('messages_title'),
           headerShown: true,
           tabBarIcon: ({ color, size }) => <MessageIcon color={color} size={size} />,
           headerRight: () => (
-            <Pressable onPress={() => router.push('/kullanicilar')} style={{ marginRight: 15 }}>
-              <Feather name="plus-square" size={24} color="#4A90E2" />
+            <Pressable onPress={() => router.push('/kullanicilar')} style={{ marginRight: 15 }} accessibilityLabel={t('start_new_chat')}>
+              <Feather name="plus-square" size={24} color={C.accent} />
             </Pressable>
           ),
         }}
@@ -64,7 +71,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profil"
         options={{
-          title: 'Profil',
+          title: t('profile_title'),
           tabBarIcon: ({ color, size }) => <Feather name="user" size={size} color={color} />,
         }}
       />

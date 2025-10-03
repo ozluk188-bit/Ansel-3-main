@@ -5,9 +5,6 @@
 
 import { Platform } from 'react-native';
 
-console.log("!!!!!!!!!! DEBUGGING THEME.TS !!!!!!!!!!");
-console.log("Platform.OS:", Platform.OS);
-
 export const Colors = {
   light: {
     // Background colors
@@ -43,21 +40,53 @@ export const Colors = {
     // Tab bar colors (assuming light theme for now)
     tabIconDefault: '#687076',
     tabIconSelected: '#4A90E2',
+
+    // State colors
+    success: '#16A34A',
+    warning: '#D97706',
+    error: '#DC2626',
+    info: '#2563EB',
   },
   dark: {
-    // Keeping dark theme as is for now, as the new designs are light-themed.
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: '#fff',
+    // Background colors
+    backgroundStart: '#0B1220',
+    backgroundMid: '#0E1A2B',
+    backgroundEnd: '#0F1F33',
+    background: '#101418',
+
+    // Accent colors
+    accentStart: '#4A90E2',
+    accentEnd: '#50C878',
+    accent: '#7AB3F0',
+
+    // Text colors
+    primaryText: '#ECEDEE',
+    secondaryText: '#C9D1D9',
+    mutedText: '#9BA1A6',
+    placeholderText: '#808891',
+    white: '#FFFFFF',
+    lightBlue: '#1B2A41',
+
+    // Component specific colors
+    cardBackground: '#151A20',
+    inputBackground: '#0F1520',
+    inputBorder: '#2A2F3A',
+    divider: '#22262E',
 
     // Icon colors
     icon: '#9BA1A6',
     iconDefault: '#9BA1A6',
-    iconSelected: '#fff',  
+    iconSelected: '#FFFFFF',
 
     // Tab bar colors
     tabIconDefault: '#9BA1A6',
-    tabIconSelected: '#fff',
+    tabIconSelected: '#FFFFFF',
+
+    // State colors
+    success: '#22C55E',
+    warning: '#F59E0B',
+    error: '#EF4444',
+    info: '#3B82F6',
   },
 };
 
